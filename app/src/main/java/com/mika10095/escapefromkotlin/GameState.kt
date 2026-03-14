@@ -25,9 +25,12 @@ class GameState {
         paint.strokeWidth = 5f
         canvas.drawLine(player.posx,player.posy,player.posx+40*cos(player.rot),player.posy+40*sin(player.rot),paint)
     }
-    fun updateState(dt: Double)
+    fun updateState(dt: Double, inputSystem : InputSystem)
     {
-
+        player.posx += inputSystem.movementInput*cos(player.rot)*dt.toFloat()*player.speed
+        player.posy += inputSystem.movementInput*sin(player.rot)*dt.toFloat()*player.speed
+        player.rot += inputSystem.turnInputGravity * dt.toFloat() * 2f
+        player.rot += inputSystem.turnInputGyro * dt.toFloat() * 2f
         //player.rot += 1*dt.toFloat()
     }
 }

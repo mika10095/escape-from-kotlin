@@ -14,6 +14,7 @@ class TiltInput(context: Context) : SensorEventListener {
         sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
 
     var turn = 0f
+    var tilt = 0f
     fun start() {
         gyro?.also {
             sensorManager.registerListener(
@@ -31,10 +32,10 @@ class TiltInput(context: Context) : SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
 
-        val tiltX = event!!.values[1]
+        val tiltY = event!!.values[1]
+        val tiltX = event.values[0]
 
-        // normalize roughly to -1..1
-        turn = (tiltX / 5f).coerceIn(-1f, 1f)
-
+        turn = (tiltY / 5f).coerceIn(-1f, 1f)
+        tilt = (tiltX / 5f).coerceIn(-1f, 1f)
     }
 }

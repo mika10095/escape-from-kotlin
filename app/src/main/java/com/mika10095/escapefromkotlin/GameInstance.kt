@@ -61,31 +61,34 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         paint.color = Color.MAGENTA
         paint.textSize = 40f
         canvas.drawText(
+            "Movement: ${inputSystem.movementInput}",
+            20f,
+            250f,
+            paint
+        )
+        canvas.drawText(
             "Gyro: ${gyroInput.yaw}",
             20f,
             150f,
             paint
         )
         canvas.drawText(
-            "Turn: ${tiltInput.turn}",
+            "Turn: ${tiltInput.turn} Tilt: ${tiltInput.tilt}",
             20f,
             200f,
             paint
         )
-        canvas.drawText("FPS: " + gameThread?.FPS.toString()+"\tUpdateMS: "+ gameThread?.updateMili.toString()+"\t DT: " + gameThread?.dt.toString(),20f,100f,paint)
+        canvas.drawText("FPS: " + gameThread?.FPS.toString()+"\tUpdateMS: "+ gameThread?.updateMili.toString()+"\t DT: " + gameThread?.dt.toString(),
+            20f,
+            100f,
+            paint)
     }
     fun update()
     {
-        val turnSpeed = gyroInput.yaw
-        val turnSpeedRotate = tiltInput.turn
-        gameState.player.posx += inputSystem.movementInput*cos(gameState.player.rot)
-        gameState.player.posy += inputSystem.movementInput*sin(gameState.player.rot)
-        gameThread?.let { gameState.player.rot += turnSpeedRotate * it.dt.toFloat() * 2f }
-        gameThread?.let { gameState.player.rot += turnSpeed * it.dt.toFloat() * 2f }
-        gameThread?.let { gameState.updateState(it.dt) }
-
-
-
+        gameThread?.let {
+            inputSystem.setSensorInput(gyroInput,tiltInput)
+            gameState.updateState(it.dt, inputSystem)
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -118,14 +121,10 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
                     if(inputSystem.backButton.contains(x,y))
                         inputSystem.movementInput = -1f
-
-                    if(inputSystem.shootButton.contains(x,y))
-                        inputSystem.shootInput = true
                 }
                 return true
             }
             MotionEvent.ACTION_UP ->{
-                inputSystem.shootInput = false
                 inputSystem.movementInput = 0f
                 return true
             }
