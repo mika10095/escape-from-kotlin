@@ -41,9 +41,9 @@ class GameState(context: Context) {
         renderer.draw(this, canvas)
         renderer.drawEnemies(this, canvas)
         renderer.drawWeapon(this, canvas)
-        drawMap(canvas)
-        drawPlayer(canvas)
-        drawEnemies(canvas)
+        //drawMap(canvas)
+        //drawPlayer(canvas)
+        //drawEnemies(canvas)
 
     }
     fun drawWeapon(canvas: Canvas)

@@ -193,6 +193,6 @@ class Renderer(context: Context) {
             spriteId++
         val baseBitmap = weaponTextures[spriteId]
         val scaledBitmap = baseBitmap.scale(weaponWidth.toInt(), weaponHeight.toInt(), false)
-        canvas.drawBitmap(scaledBitmap, left, top, null) 
+        canvas.drawBitmap(scaledBitmap, left, top, null)
     }
 }
