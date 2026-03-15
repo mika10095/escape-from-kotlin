@@ -1,4 +1,4 @@
-package com.mika10095.escapefromkotlin
+package com.mika10095.escapefromkotlin.input
 
 import android.content.Context
 import android.hardware.Sensor
@@ -6,15 +6,15 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 
-class TiltInput(context: Context) : SensorEventListener {
+class GyroInput(context: Context) : SensorEventListener {
     private val sensorManager =
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
     private val gyro: Sensor? =
-        sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+        sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
+    var yaw = 0f
     var turn = 0f
-    var tilt = 0f
     fun start() {
         gyro?.also {
             sensorManager.registerListener(
@@ -32,10 +32,11 @@ class TiltInput(context: Context) : SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
 
-        val tiltY = event!!.values[1]
-        val tiltX = event.values[0]
+        if (event?.sensor?.type == Sensor.TYPE_GYROSCOPE) {
 
-        turn = (tiltY / 5f).coerceIn(-1f, 1f)
-        tilt = (tiltX / 5f).coerceIn(-1f, 1f)
+            val rotX = event.values[0]
+            yaw = rotX
+        }
+
     }
 }

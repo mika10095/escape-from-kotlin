@@ -1,5 +1,6 @@
-package com.mika10095.escapefromkotlin
+package com.mika10095.escapefromkotlin.engine
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -7,9 +8,9 @@ import android.graphics.Paint
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
+import com.mika10095.escapefromkotlin.input.GyroInput
+import com.mika10095.escapefromkotlin.input.InputSystem
+import com.mika10095.escapefromkotlin.input.TiltInput
 
 class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     var gameThread: GameThread? = null
@@ -23,12 +24,13 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     override fun surfaceCreated(p0: SurfaceHolder) {
-        inputSystem = InputSystem(width,height)
+        inputSystem = InputSystem(width, height)
         gyroInput = GyroInput(context)
         tiltInput = TiltInput(context)
         gyroInput.start()
         tiltInput.start()
-        gameState.player.setPosition(width/2f,height/2f)
+        gameState.player.setPosition(width/2f+32,height/2f+32)
+        gameState.gameMap.setPosition(width/2f-4*64,height/2f-4*64)
         gameThread = GameThread(holder,this)
         gameThread?.running = true
         gameThread?.start()
@@ -45,19 +47,18 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
         canvas.drawColor(Color.BLACK)
-        drawDebug(canvas)
         gameState.drawState(canvas)
-        val paint = Paint()
+        drawDebug(canvas)
         update()
     }
     fun drawDebug(canvas: Canvas){
         val paint = Paint()
-        paint.color = Color.YELLOW
+        /*paint.color = Color.YELLOW
         canvas.drawRect(inputSystem.forwardButton,paint)
         paint.color = Color.BLUE
         canvas.drawRect(inputSystem.backButton,paint)
         paint.color = Color.CYAN
-        canvas.drawRect(inputSystem.shootButton,paint)
+        canvas.drawRect(inputSystem.shootButton,paint)*/
         paint.color = Color.MAGENTA
         paint.textSize = 40f
         canvas.drawText(
@@ -91,6 +92,7 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when(event?.action){
             MotionEvent.ACTION_DOWN -> {

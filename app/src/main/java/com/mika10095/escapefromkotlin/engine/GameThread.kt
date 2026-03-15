@@ -1,4 +1,4 @@
-package com.mika10095.escapefromkotlin
+package com.mika10095.escapefromkotlin.engine
 
 import android.graphics.Canvas
 import android.view.SurfaceHolder

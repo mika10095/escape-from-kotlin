@@ -1,6 +1,7 @@
-package com.mika10095.escapefromkotlin
+package com.mika10095.escapefromkotlin.input
 
 import android.graphics.RectF
+import kotlin.math.abs
 
 class InputSystem(width: Int, height: Int) {
 
@@ -14,8 +15,13 @@ class InputSystem(width: Int, height: Int) {
     var shootInput = false
     fun setSensorInput(gyroInput: GyroInput, tiltInput: TiltInput)
     {
-        turnInputGyro = gyroInput.yaw
-        turnInputGravity = tiltInput.turn
+        if (abs(gyroInput.yaw) > 0.1 )
+        {turnInputGyro = gyroInput.yaw}
+        else {turnInputGyro = 0f}
+        if (abs(tiltInput.turn) > 0.05 )
+        {turnInputGravity = tiltInput.turn}
+        else {turnInputGravity = 0f}
+
         mapInputGravity = tiltInput.tilt
     }
 }
