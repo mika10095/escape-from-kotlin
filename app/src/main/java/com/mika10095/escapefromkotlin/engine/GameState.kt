@@ -1,17 +1,19 @@
 package com.mika10095.escapefromkotlin.engine
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import com.mika10095.escapefromkotlin.engine.map.GameMap
+import com.mika10095.escapefromkotlin.engine.map.WallRenderer
 import com.mika10095.escapefromkotlin.ents.Enemy
 import com.mika10095.escapefromkotlin.ents.Player
 import com.mika10095.escapefromkotlin.input.InputSystem
 import kotlin.math.cos
 import kotlin.math.sin
 
-class GameState {
-    val wallRenderer = WallRenderer()
+class GameState(context: Context) {
+    val wallRenderer = WallRenderer(context)
     val player = Player()
     val enemies = mutableListOf<Enemy>()
     val gameMap = GameMap(8,8,arrayOf(

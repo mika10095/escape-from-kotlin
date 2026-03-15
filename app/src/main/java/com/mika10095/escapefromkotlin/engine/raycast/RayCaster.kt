@@ -1,6 +1,10 @@
-package com.mika10095.escapefromkotlin.engine
+package com.mika10095.escapefromkotlin.engine.raycast
 
 import com.mika10095.escapefromkotlin.engine.map.GameMap
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.sin
 
 class RayCaster {
 
@@ -9,10 +13,10 @@ class RayCaster {
         py: Float,
         angle: Float,
         map: GameMap
-    ): Float {
+    ): RayHit {
 
-        val dirX = kotlin.math.cos(angle)
-        val dirY = kotlin.math.sin(angle)
+        val dirX = cos(angle)
+        val dirY = sin(angle)
 
         val tile = map.tileSize
 
@@ -22,8 +26,8 @@ class RayCaster {
         var mapX = (relX / tile).toInt()
         var mapY = (relY / tile).toInt()
 
-        val deltaDistX = kotlin.math.abs(tile / dirX)
-        val deltaDistY = kotlin.math.abs(tile / dirY)
+        val deltaDistX = abs(tile / dirX)
+        val deltaDistY = abs(tile / dirY)
 
         var sideDistX: Float
         var sideDistY: Float
@@ -66,9 +70,27 @@ class RayCaster {
                 hit = true
         }
 
-        return if (side == 0)
-            sideDistX - deltaDistX
-        else
-            sideDistY - deltaDistY
+
+
+        val perpDist =
+            if (side == 0)
+                sideDistX - deltaDistX
+            else
+                sideDistY - deltaDistY
+
+        val wallX =
+            if (side == 0)
+                (relY + perpDist * dirY) / tile
+            else
+                (relX + perpDist * dirX) / tile
+
+        val wallXFrac = wallX - floor(wallX)
+
+        return RayHit(
+            perpDist,
+            wallXFrac,
+            map.map[mapY * map.width + mapX],
+            side
+        )
     }
 }

@@ -14,7 +14,7 @@ import com.mika10095.escapefromkotlin.input.TiltInput
 
 class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     var gameThread: GameThread? = null
-    val gameState: GameState = GameState()
+    val gameState: GameState = GameState(context)
     lateinit var inputSystem: InputSystem
     lateinit var gyroInput: GyroInput
     lateinit var tiltInput: TiltInput
