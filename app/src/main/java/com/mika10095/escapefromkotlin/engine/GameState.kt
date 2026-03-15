@@ -20,10 +20,10 @@ class GameState(context: Context) {
         1,1,1,1,1,1,1,1,
         1,0,0,0,0,0,0,1,
         1,0,0,0,0,0,1,1,
-        1,0,1,1,0,1,1,1,
+        1,0,1,1,4,1,1,1,
         1,0,1,0,0,0,1,1,
         1,0,1,0,0,0,0,1,
-        1,0,0,0,0,0,0,1,
+        1,0,4,0,0,0,0,1,
         1,1,1,1,1,1,1,1,
     ))
 
@@ -71,6 +71,9 @@ class GameState(context: Context) {
     }
     fun updateState(dt: Double, inputSystem : InputSystem)
     {
+        if(gameMap.tileAtFromWorld(player.posx+40*cos(player.rot),player.posy+40*sin(player.rot))==4){
+            gameMap.setTileAtFromWorld(player.posx+40*cos(player.rot),player.posy+40*sin(player.rot),0)
+        }
         val moveX = cos(player.rot) * inputSystem.movementInput * dt.toFloat() * player.speed
         val moveY = sin(player.rot) * inputSystem.movementInput * dt.toFloat() * player.speed
         if (!gameMap.isWallCircle(player.posx + moveX, player.posy, player.radius)) {

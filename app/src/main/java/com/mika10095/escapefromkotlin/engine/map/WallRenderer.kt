@@ -13,7 +13,9 @@ import androidx.core.graphics.get
 
 class WallRenderer(context: Context) {
     val raycaster = RayCaster()
-    val wallTextures = arrayOf(BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick))
+    val wallTextures = arrayOf(
+        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick)
+    )
 
     fun draw(state: GameState, canvas: Canvas) {
 
@@ -23,7 +25,7 @@ class WallRenderer(context: Context) {
         val paint = Paint()
 
         val rays = 128
-        val fov = Math.toRadians(60.0).toFloat()
+        val fov = Math.toRadians(72.0).toFloat()
 
         val screenW = canvas.width.toFloat()
         val screenH = canvas.height.toFloat()
@@ -54,6 +56,7 @@ class WallRenderer(context: Context) {
             val bottom = screenH/2 + wallHeight/2
 
             val tex = wallTextures[0]
+
 
             var texX = (hit.wallX * tex.width).toInt().coerceIn(0, tex.width - 1)
 
