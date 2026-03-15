@@ -20,6 +20,7 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     lateinit var tiltInput: TiltInput
 
     init {
+        gameState.init()
         holder.addCallback(this)
     }
 
@@ -94,45 +95,41 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        when(event?.action){
-            MotionEvent.ACTION_DOWN -> {
-                for(i in 0 until event.pointerCount){
+        event ?: return false
 
-                    val x = event.getX(i)
-                    val y = event.getY(i)
-
-                    if(inputSystem.forwardButton.contains(x,y))
-                        inputSystem.movementInput = 1f
-
-                    if(inputSystem.backButton.contains(x,y))
-                        inputSystem.movementInput = -1f
-
-                    if(inputSystem.shootButton.contains(x,y))
-                        inputSystem.shootInput = true
-                }
-            return true
-            }
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN,
             MotionEvent.ACTION_MOVE -> {
-                for(i in 0 until event.pointerCount){
+                // Reset inputs for this frame
+                var forward = false
+                var back = false
+                var shoot = false
 
+                for (i in 0 until event.pointerCount) {
                     val x = event.getX(i)
                     val y = event.getY(i)
 
-                    if(inputSystem.forwardButton.contains(x,y))
-                        inputSystem.movementInput = 1f
-
-                    if(inputSystem.backButton.contains(x,y))
-                        inputSystem.movementInput = -1f
+                    if (inputSystem.forwardButton.contains(x, y)) forward = true
+                    if (inputSystem.backButton.contains(x, y)) back = true
+                    if (inputSystem.shootButton.contains(x, y)) shoot = true
                 }
-                return true
+
+                // Apply inputs
+                inputSystem.movementInput = when {
+                    forward -> 1f
+                    back -> -1f
+                    else -> 0f
+                }
+                inputSystem.shootInput = shoot
             }
-            MotionEvent.ACTION_UP ->{
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
+                // Reset all inputs when any finger lifts; you could refine this to track pointers individually
                 inputSystem.movementInput = 0f
-                return true
+                inputSystem.shootInput = false
             }
         }
 
-
-        return super.onTouchEvent(event)
+        return true
     }
 }
