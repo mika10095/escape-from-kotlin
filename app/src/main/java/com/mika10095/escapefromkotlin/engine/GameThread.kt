@@ -1,6 +1,7 @@
 package com.mika10095.escapefromkotlin.engine
 
 import android.graphics.Canvas
+import android.util.Log
 import android.view.SurfaceHolder
 
 class GameThread(val surfaceHolder: SurfaceHolder, val gameInstance: GameInstance) : Thread() {
@@ -24,7 +25,7 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameInstance: GameInstanc
 
             if (currentTime - secondTimer > 1000)
             {
-                println("Framerate: $frames")
+                Log.d("Game", "Framerate: $frames")
                 FPS = frames
                 frames = 0
                 secondTimer = currentTime
