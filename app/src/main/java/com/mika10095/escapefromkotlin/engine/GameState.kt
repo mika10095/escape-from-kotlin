@@ -71,8 +71,9 @@ class GameState(context: Context) {
     }
     fun updateState(dt: Double, inputSystem : InputSystem)
     {
-        if(gameMap.tileAtFromWorld(player.posx+40*cos(player.rot),player.posy+40*sin(player.rot))==4){
+        if(gameMap.tileAtFromWorld(player.posx+40*cos(player.rot),player.posy+40*sin(player.rot))==4 && inputSystem.shootInput){
             gameMap.setTileAtFromWorld(player.posx+40*cos(player.rot),player.posy+40*sin(player.rot),0)
+            inputSystem.shootInput = false
         }
         val moveX = cos(player.rot) * inputSystem.movementInput * dt.toFloat() * player.speed
         val moveY = sin(player.rot) * inputSystem.movementInput * dt.toFloat() * player.speed
