@@ -1,6 +1,7 @@
 package com.mika10095.escapefromkotlin.engine.map
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
@@ -16,6 +17,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 
 class Renderer(context: Context) {
     val raycaster = RayCaster()
@@ -24,24 +26,24 @@ class Renderer(context: Context) {
 
 
     val wallTextures = arrayOf(
-        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick,) ,
-        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick,),
-        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick,),
-        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick,),
-        BitmapFactory.decodeResource(context.resources, R.drawable.door_default,)
+        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick) ,
+        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
+        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
+        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
+        BitmapFactory.decodeResource(context.resources, R.drawable.door_default)
 
     )
     val enemyTextures = arrayOf(
-        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_1,) ,
-        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_2,),
-        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_3,),
-        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_4,),
-        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_shoot,)
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_1) ,
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_2),
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_3),
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_4),
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_shoot)
 
     )
     val weaponTextures = arrayOf(
-        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_1,) ,
-        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_2,) ,
+        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_1) ,
+        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_2) ,
     )
 
 
@@ -186,6 +188,11 @@ class Renderer(context: Context) {
         val bottom = canvas.height.toFloat()
 
         val dst = RectF(left, top, right, bottom)
-        canvas.drawBitmap(weaponTextures[0], null, dst, null)
+        var spriteId = 0
+        if (state.player.shooting)
+            spriteId++
+        val baseBitmap = weaponTextures[spriteId]
+        val scaledBitmap = baseBitmap.scale(weaponWidth.toInt(), weaponHeight.toInt(), false)
+        canvas.drawBitmap(scaledBitmap, left, top, null) 
     }
 }

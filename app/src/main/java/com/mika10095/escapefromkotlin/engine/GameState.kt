@@ -100,26 +100,10 @@ class GameState(context: Context) {
     }
     fun updateState(dt: Double, inputSystem : InputSystem)
     {
-        if(gameMap.tileAtFromWorld(player.posx+40*cos(player.rot),player.posy+40*sin(player.rot))==4 && inputSystem.shootInput){
-            gameMap.setTileAtFromWorld(player.posx+40*cos(player.rot),player.posy+40*sin(player.rot),0)
-            inputSystem.shootInput = false
-        }
-        val moveX = cos(player.rot) * inputSystem.movementInput * dt.toFloat() * player.speed
-        val moveY = sin(player.rot) * inputSystem.movementInput * dt.toFloat() * player.speed
-        if (!gameMap.isWallCircle(player.posx + moveX, player.posy, player.radius)) {
-            player.posx += moveX
-        }
-        if (!gameMap.isWallCircle(player.posx, player.posy + moveY, player.radius)) {
-            player.posy += moveY
-        }
-        player.rot += inputSystem.turnInputGravity * dt.toFloat() * player.turnspeed
-        player.rot -= inputSystem.turnInputGyro * dt.toFloat() * player.turnspeed/2
-        if (player.rot < 0f) player.rot += (2 * Math.PI).toFloat()
-        if (player.rot > (2 * Math.PI).toFloat()) player.rot -= (2 * Math.PI).toFloat()
-        //player.rot += 1*dt.toFloat()
+
         for (enemy in enemies) {
             enemy.update(this, dt)
-
+            player.update(this,inputSystem, dt)
         }
     }
 }
