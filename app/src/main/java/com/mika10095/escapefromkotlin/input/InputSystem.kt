@@ -33,4 +33,14 @@ class InputSystem(width: Int, height: Int) {
         if(tiltInput.tilt >= 1f)
             mapInput = false
     }
+    fun clearInputs()
+    {
+        turnInputGyro = 0f
+        turnInputGravity = 0f
+        turnInput = 0f
+        movementInput = 0f
+        shootInput = false
+        mapInput = false
+        menuInput = false
+    }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import com.mika10095.escapefromkotlin.engine.map.GameMap
 import com.mika10095.escapefromkotlin.engine.map.Renderer
 import com.mika10095.escapefromkotlin.ents.Enemy
@@ -26,6 +27,17 @@ class GameState(context: Context) {
         1,0,4,0,0,0,0,1,
         1,1,1,1,1,1,1,1,
     ))
+    var OpenMap = false
+    var GameLoop = false
+    var MenuOpen = true
+
+    var selectedMenuItem = 0
+    var menuSwitchCooldown = -1500000.0
+
+    val menuItems = listOf(
+        "Start Game",
+        "Quit"
+    )
     fun init(){
         val enemy1 = Enemy()
         enemy1.setPosition(1000f,555f)
@@ -33,22 +45,62 @@ class GameState(context: Context) {
     }
     fun drawState(canvas: Canvas)
     {
-        val paint = Paint()
-        paint.color = Color.rgb(75,75,75)
-        canvas.drawRect(0f,0f,canvas.width.toFloat(),canvas.height/2f,paint)
-        paint.color = Color.rgb(125,125,125)
-        canvas.drawRect(0f,canvas.height/2f,canvas.width.toFloat(),canvas.height.toFloat(),paint)
-        renderer.draw(this, canvas)
-        renderer.drawEnemies(this, canvas)
-        renderer.drawWeapon(this, canvas)
-        //drawMap(canvas)
-        //drawPlayer(canvas)
-        //drawEnemies(canvas)
+        if (MenuOpen) {
+            drawMainMenu(canvas)
+            return
+        }
+        if(GameLoop) {
+            val paint = Paint()
+            paint.color = Color.rgb(75, 75, 75)
+            canvas.drawRect(0f, 0f, canvas.width.toFloat(), canvas.height / 2f, paint)
+            paint.color = Color.rgb(125, 125, 125)
+            canvas.drawRect(
+                0f,
+                canvas.height / 2f,
+                canvas.width.toFloat(),
+                canvas.height.toFloat(),
+                paint
+            )
+            renderer.draw(this, canvas)
+            renderer.drawEnemies(this, canvas)
+            renderer.drawWeapon(this, canvas)
+        }
+        if(OpenMap) {
+            drawMap(canvas)
+            drawPlayer(canvas)
+            drawEnemies(canvas)
+        }
 
     }
-    fun drawWeapon(canvas: Canvas)
-    {
+    fun drawMainMenu(canvas: Canvas) {
+        val paint = Paint()
+        paint.textSize = 80f
+        paint.textAlign = Paint.Align.CENTER
 
+        // Title
+        paint.color = Color.WHITE
+        canvas.drawText(
+            "Escape From Kotlin",
+            canvas.width / 2f,
+            200f,
+            paint
+        )
+
+        paint.textSize = 60f
+
+        for (i in menuItems.indices) {
+
+            paint.color =
+                if (i == selectedMenuItem) Color.YELLOW
+                else Color.GRAY
+
+            canvas.drawText(
+                menuItems[i],
+                canvas.width / 2f,
+                400f + i * 100,
+                paint
+            )
+        }
     }
     fun drawPlayer(canvas: Canvas)
     {
@@ -100,10 +152,65 @@ class GameState(context: Context) {
     }
     fun updateState(dt: Double, inputSystem : InputSystem)
     {
+        if (MenuOpen) {
+            menuSwitchCooldown -= dt
+            //Log.d("debug","$menuSwitchCooldown")
+            if (inputSystem.movementInput > 0 && menuSwitchCooldown < 0) {
+                selectedMenuItem--
+                if (selectedMenuItem < 0)
+                    selectedMenuItem = menuItems.size - 1
+                menuSwitchCooldown = 0.25
+            }
 
-        for (enemy in enemies) {
-            enemy.update(this, dt)
-            player.update(this,inputSystem, dt)
+            if (inputSystem.movementInput < 0 && menuSwitchCooldown < 0) {
+                selectedMenuItem++
+                if (selectedMenuItem >= menuItems.size)
+                    selectedMenuItem = 0
+                menuSwitchCooldown = 0.25
+            }
+
+            if (inputSystem.shootInput) {
+
+                when (selectedMenuItem) {
+                    0 -> {
+                        MenuOpen = false
+                        GameLoop = true
+                    }
+
+                    1 -> {
+                        android.os.Process.killProcess(android.os.Process.myPid())
+                    }
+                }
+            }
         }
+        if(inputSystem.mapInput && GameLoop)
+        {
+            GameLoop = false
+            OpenMap = true
+        }
+        if(OpenMap && !MenuOpen && !inputSystem.mapInput)
+        {
+            GameLoop = true
+            OpenMap = false
+            inputSystem.clearInputs()
+        }
+        if(inputSystem.menuInput)
+        {
+            GameLoop = false
+            OpenMap = false
+            MenuOpen = true
+            inputSystem.clearInputs()
+        }
+        if(GameLoop){
+            for (enemy in enemies) {
+                enemy.update(this, dt)
+                player.update(this,inputSystem, dt)
+            }
+        }
+        if(OpenMap)
+        {
+
+        }
+        Log.d("debug","Game: $GameLoop\tMap: $OpenMap\tMenu: $MenuOpen ")
     }
 }
