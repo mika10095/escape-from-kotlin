@@ -28,7 +28,7 @@ class InputSystem(width: Int, height: Int) {
         {turnInputGyro = gyroInput.yaw}
         if (abs(tiltInput.turn) > 0.05 )
         {turnInputGravity = tiltInput.turn}
-        if(tiltInput.tilt < 0.1)
+        if(tiltInput.tilt < 1f)
             mapInput = true
         if(tiltInput.tilt >= 1f)
             mapInput = false
