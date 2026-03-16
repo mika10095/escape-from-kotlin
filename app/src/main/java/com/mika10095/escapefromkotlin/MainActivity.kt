@@ -1,5 +1,6 @@
 package com.mika10095.escapefromkotlin
 
+//noinspection SuspiciousImport
 import android.R
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

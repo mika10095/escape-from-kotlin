@@ -30,9 +30,9 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         tiltInput = TiltInput(context)
         gyroInput.start()
         tiltInput.start()
-        gameState.player.setPosition(width/2f+32,height/2f+32)
-        gameState.gameMap.setPosition(width/2f-4*64,height/2f-4*64)
-        gameThread = GameThread(holder,this)
+        gameState.player.setPosition(width / 2f + 32, height / 2f + 32)
+        gameState.gameMap.setPosition(width / 2f - 4 * 64, height / 2f - 4 * 64)
+        gameThread = GameThread(holder, this)
         gameThread?.running = true
         gameThread?.start()
     }
@@ -52,7 +52,8 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         drawDebug(canvas)
         update()
     }
-    fun drawDebug(canvas: Canvas){
+
+    fun drawDebug(canvas: Canvas) {
         val paint = Paint()
         /*paint.color = Color.YELLOW
         canvas.drawRect(inputSystem.menuButton,paint)
@@ -82,15 +83,17 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             200f,
             paint
         )
-        canvas.drawText("FPS: " + gameThread?.FPS.toString()+"\tUpdateMS: "+ gameThread?.updateMili.toString()+"\t DT: " + gameThread?.dt.toString(),
+        canvas.drawText(
+            "FPS: " + gameThread?.FPS.toString() + "\tUpdateMS: " + gameThread?.updateMili.toString() + "\t DT: " + gameThread?.dt.toString(),
             20f,
             100f,
-            paint)
+            paint
+        )
     }
-    fun update()
-    {
+
+    fun update() {
         gameThread?.let {
-            inputSystem.setSensorInput(gyroInput,tiltInput)
+            inputSystem.setSensorInput(gyroInput, tiltInput)
             gameState.updateState(it.dt, inputSystem)
         }
     }

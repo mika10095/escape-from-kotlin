@@ -4,7 +4,7 @@ import com.mika10095.escapefromkotlin.engine.GameState
 import kotlin.math.PI
 import kotlin.math.abs
 
-class Enemy(): EntityBase() {
+class Enemy : EntityBase() {
     var spriteId = 0
     var attackRange = 100f
     var visible = false

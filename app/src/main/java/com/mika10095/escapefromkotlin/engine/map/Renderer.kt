@@ -21,8 +21,8 @@ import androidx.core.graphics.scale
 
 class Renderer(context: Context) {
     val raycaster = RayCaster()
-    val srcRect = android.graphics.Rect()
-    val dstRect = android.graphics.RectF()
+    val srcRect = Rect()
+    val dstRect = RectF()
 
 
     val wallTextures = arrayOf(
@@ -187,7 +187,7 @@ class Renderer(context: Context) {
         val right = left + weaponWidth
         val bottom = canvas.height.toFloat()
 
-        val dst = RectF(left, top, right, bottom)
+        RectF(left, top, right, bottom)
         var spriteId = 0
         if (state.player.shooting)
             spriteId++
