@@ -1,11 +1,11 @@
 package com.mika10095.escapefromkotlin.engine.map
 
-class GameMap(x:Int, y:Int,mapvalues: Array<Int>) {
+class GameMap(x:Int, y:Int,mapValues: Array<Int>) {
     var width  = x
     var height  = y
     var tileSize = 64f
     val mapSize get() = (width*height)
-    var map: Array<Int> = mapvalues
+    var map: Array<Int> = mapValues
     var posX = 0f
     var posY = 0f
     fun setPosition(x: Float,y: Float)

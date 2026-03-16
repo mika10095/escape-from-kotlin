@@ -55,11 +55,13 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     fun drawDebug(canvas: Canvas){
         val paint = Paint()
         /*paint.color = Color.YELLOW
-        canvas.drawRect(inputSystem.forwardButton,paint)
+        canvas.drawRect(inputSystem.menuButton,paint)
         paint.color = Color.BLUE
-        canvas.drawRect(inputSystem.backButton,paint)
+        canvas.drawRect(inputSystem.mapButton,paint)
         paint.color = Color.CYAN
-        canvas.drawRect(inputSystem.shootButton,paint)*/
+        canvas.drawRect(inputSystem.turnRightButton,paint)
+        paint.color = Color.RED
+        canvas.drawRect(inputSystem.turnLeftButton,paint)*/
         paint.color = Color.MAGENTA
         paint.textSize = 40f
         canvas.drawText(
@@ -104,6 +106,10 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 var forward = false
                 var back = false
                 var shoot = false
+                var left = false
+                var right = false
+                var map = false
+                var menu = false
 
                 for (i in 0 until event.pointerCount) {
                     val x = event.getX(i)
@@ -112,6 +118,10 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                     if (inputSystem.forwardButton.contains(x, y)) forward = true
                     if (inputSystem.backButton.contains(x, y)) back = true
                     if (inputSystem.shootButton.contains(x, y)) shoot = true
+                    if (inputSystem.turnLeftButton.contains(x, y)) left = true
+                    if (inputSystem.turnRightButton.contains(x, y)) right = true
+                    if (inputSystem.mapButton.contains(x, y)) map = true
+                    if (inputSystem.menuButton.contains(x, y)) menu = true
                 }
 
                 // Apply inputs
@@ -120,13 +130,32 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                     back -> -1f
                     else -> 0f
                 }
+                inputSystem.turnInput = when {
+                    right -> 1f
+                    left -> -1f
+                    else -> 0f
+                }
+                inputSystem.mapInput = map
+                inputSystem.menuInput = menu
                 inputSystem.shootInput = shoot
             }
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
-                // Reset all inputs when any finger lifts; you could refine this to track pointers individually
-                inputSystem.movementInput = 0f
-                inputSystem.shootInput = false
+                val index = event.actionIndex
+                val x = event.getX(index)
+                val y = event.getY(index)
+
+                if (inputSystem.forwardButton.contains(x, y))
+                    inputSystem.movementInput = 0f
+
+                if (inputSystem.backButton.contains(x, y))
+                    inputSystem.movementInput = 0f
+
+                if (inputSystem.turnLeftButton.contains(x, y))
+                    inputSystem.turnInput = 0f
+
+                if (inputSystem.turnRightButton.contains(x, y))
+                    inputSystem.turnInput = 0f
             }
         }
 
