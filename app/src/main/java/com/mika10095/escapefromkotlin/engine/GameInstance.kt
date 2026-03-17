@@ -22,6 +22,7 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     init {
         gameState.init()
         holder.addCallback(this)
+
     }
 
     override fun surfaceCreated(p0: SurfaceHolder) {

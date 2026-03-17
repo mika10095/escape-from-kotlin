@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(gameInstance)
         hideSystemUI()
     }
+
     private fun hideSystemUI() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(

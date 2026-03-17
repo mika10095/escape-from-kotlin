@@ -1,23 +1,21 @@
 package com.mika10095.escapefromkotlin.engine.map
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LightingColorFilter
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import com.mika10095.escapefromkotlin.R
 import com.mika10095.escapefromkotlin.engine.GameState
 import com.mika10095.escapefromkotlin.engine.raycast.RayCaster
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.scale
 
 class Renderer(context: Context) {
     val raycaster = RayCaster()
@@ -26,7 +24,7 @@ class Renderer(context: Context) {
 
 
     val wallTextures = arrayOf(
-        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick) ,
+        BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
         BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
         BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
         BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
@@ -34,7 +32,7 @@ class Renderer(context: Context) {
 
     )
     val enemyTextures = arrayOf(
-        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_1) ,
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_1),
         BitmapFactory.decodeResource(context.resources, R.drawable.enemy_2),
         BitmapFactory.decodeResource(context.resources, R.drawable.enemy_3),
         BitmapFactory.decodeResource(context.resources, R.drawable.enemy_4),
@@ -42,8 +40,8 @@ class Renderer(context: Context) {
 
     )
     val weaponTextures = arrayOf(
-        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_1) ,
-        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_2) ,
+        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_1),
+        BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_2),
     )
 
 
@@ -66,7 +64,7 @@ class Renderer(context: Context) {
         for (i in 0 until rays) {
 
             val rayAngle =
-                player.rot - fov/2 +
+                player.rot - fov / 2 +
                         (i + 0.5f) / rays * fov
 
             val hit = raycaster.castRay(
@@ -83,8 +81,8 @@ class Renderer(context: Context) {
 
             val x = i * columnWidth
 
-            val top = screenH/2 - wallHeight/2
-            val bottom = screenH/2 + wallHeight/2
+            val top = screenH / 2 - wallHeight / 2
+            val bottom = screenH / 2 + wallHeight / 2
 
             val tex = wallTextures[hit.tile]
 
@@ -114,12 +112,13 @@ class Renderer(context: Context) {
             paint.isFilterBitmap = false
 
             val srcRect = Rect(texX, 0, texX + 1, tex.height)
-            val dstRect = RectF(i.toFloat(), top, i+1f, bottom) // width=1 pixel in bitmap
+            val dstRect = RectF(i.toFloat(), top, i + 1f, bottom) // width=1 pixel in bitmap
             columnCanvas.drawBitmap(tex, srcRect, dstRect, paint)
         }
         val dst = RectF(0f, 0f, screenW, screenH)
         canvas.drawBitmap(columnBitmap, null, dst, null)
     }
+
     fun drawEnemies(state: GameState, canvas: Canvas) {
 
         val player = state.player
@@ -136,17 +135,17 @@ class Renderer(context: Context) {
             val dx = enemy.posx - player.posx
             val dy = enemy.posy - player.posy
 
-            val distance = sqrt(dx*dx + dy*dy).toFloat()
+            val distance = sqrt(dx * dx + dy * dy).toFloat()
 
             val angleToEnemy = kotlin.math.atan2(dy, dx)
 
             var angleDiff = angleToEnemy - player.rot
 
-            while (angleDiff < -Math.PI) angleDiff += (2*Math.PI).toFloat()
-            while (angleDiff > Math.PI) angleDiff -= (2*Math.PI).toFloat()
+            while (angleDiff < -Math.PI) angleDiff += (2 * Math.PI).toFloat()
+            while (angleDiff > Math.PI) angleDiff -= (2 * Math.PI).toFloat()
 
 
-            if (kotlin.math.abs(angleDiff) > fov/2) continue
+            if (kotlin.math.abs(angleDiff) > fov / 2) continue
 
             var diff = angleToEnemy - enemy.rot
             while (diff > Math.PI) diff -= (2 * Math.PI).toFloat()
@@ -166,21 +165,21 @@ class Renderer(context: Context) {
             val size =
                 (screenH * 64f) / distance
 
-            val top = screenH/2 - size/2
-            val bottom = screenH/2 + size/2
+            val top = screenH / 2 - size / 2
+            val bottom = screenH / 2 + size / 2
 
-            val left = screenX - size/2
-            val right = screenX + size/2f
+            val left = screenX - size / 2
+            val right = screenX + size / 2f
 
             val dst = RectF(left, top, right, bottom)
 
-            canvas.drawBitmap(enemyTextures[enemy.spriteId*5+sprite], null, dst, null)
+            canvas.drawBitmap(enemyTextures[enemy.spriteId * 5 + sprite], null, dst, null)
         }
     }
 
     fun drawWeapon(state: GameState, canvas: Canvas) {
-        val weaponWidth = 64f*16
-        val weaponHeight = 64f*16
+        val weaponWidth = 64f * 16
+        val weaponHeight = 64f * 16
 
         val left = (canvas.width - weaponWidth) / 2f   // center horizontally
         val top = canvas.height - weaponHeight         // bottom of screen

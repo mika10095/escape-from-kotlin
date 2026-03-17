@@ -10,6 +10,7 @@ import com.mika10095.escapefromkotlin.ents.Enemy
 import com.mika10095.escapefromkotlin.ents.Player
 import com.mika10095.escapefromkotlin.input.InputSystem
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 class GameState(context: Context) {
@@ -29,7 +30,7 @@ class GameState(context: Context) {
             1, 1, 1, 1, 1, 1, 1, 1,
         )
     )
-
+    var changingMenuItem = false
     var selectedMenuItem = 0
     var menuSwitchCooldown = -1500000.0
 
@@ -62,11 +63,18 @@ class GameState(context: Context) {
         "Tilt Aim Sens",
         "Back"
     )
+    val gyroOptions = listOf(
+        "Full Aim + Map",
+        "Full Aim",
+        "Tilt Only Aim",
+        "Turn Only Aim"
+    )
 
     fun init() {
         val enemy1 = Enemy()
         enemy1.setPosition(1000f, 555f)
         enemies.add(enemy1)
+        settingsManager.clearPrefs()
     }
 
     fun drawState(canvas: Canvas) {
@@ -116,8 +124,11 @@ class GameState(context: Context) {
         for (i in menuItems.indices) {
 
             paint.color =
-                if (i == selectedMenuItem) Color.YELLOW
-                else Color.GRAY
+                when (i) {
+                    selectedMenuItem if changingMenuItem -> Color.GREEN
+                    selectedMenuItem -> Color.YELLOW
+                    else -> Color.GRAY
+                }
 
             val valueText = if (currentMenu == MenuType.SETTINGS) {
                 when (i) {
@@ -197,69 +208,83 @@ class GameState(context: Context) {
         }
     }
 
-    fun updateState(dt: Double, inputSystem: InputSystem) {
+    fun updateMenu(dt: Double, inputSystem: InputSystem) {
+        if ( menuSwitchCooldown > 0 ) return
         val menuItems = when (currentMenu) {
             MenuType.MAIN -> mainMenuItems
             MenuType.SETTINGS -> settingsMenuItems
-
         }
         if (currentState == StateEnum.MENU) {
-            menuSwitchCooldown -= dt
             //Log.d("debug","$menuSwitchCooldown")
-            if (inputSystem.movementInput > 0 && menuSwitchCooldown < 0) {
+            if (inputSystem.movementInput > 0 && !changingMenuItem) {
                 selectedMenuItem--
                 if (selectedMenuItem < 0)
                     selectedMenuItem = menuItems.size - 1
                 menuSwitchCooldown = 0.25
             }
 
-            if (inputSystem.movementInput < 0 && menuSwitchCooldown < 0) {
+            if (inputSystem.movementInput < 0 && !changingMenuItem) {
                 selectedMenuItem++
                 if (selectedMenuItem >= menuItems.size)
                     selectedMenuItem = 0
                 menuSwitchCooldown = 0.25
             }
 
-            if (inputSystem.shootInput) {
+            if (inputSystem.shootInput && currentMenu == MenuType.MAIN) {
+                when (selectedMenuItem) {
 
-                when (currentMenu) {
-
-                    MenuType.MAIN -> {
-                        when (selectedMenuItem) {
-
-                            0 -> {
-                                currentState = StateEnum.GAME
-                            }
-
-                            1 -> {
-                                currentMenu = MenuType.SETTINGS
-                                selectedMenuItem = 0
-                            }
-
-                            2 -> {
-                                android.os.Process.killProcess(android.os.Process.myPid())
-                            }
-                        }
+                    0 -> {
+                        currentState = StateEnum.GAME
                     }
 
-                    MenuType.SETTINGS -> {
-                        when (selectedMenuItem) {
+                    1 -> {
+                        currentMenu = MenuType.SETTINGS
+                        selectedMenuItem = 0
+                    }
 
-                            0 -> settingsManager.fov += 5f
-                            1 -> settingsManager.rayCount += 32
-                            2 -> settingsManager.buttonAimSens += 0.1f
-                            3 -> settingsManager.gyroAimSens += 0.1f
-                            4 -> settingsManager.tiltAimSens += 0.1f
+                    2 -> {
+                        android.os.Process.killProcess(android.os.Process.myPid())
+                    }
 
-                            5 -> {
-                                currentMenu = MenuType.MAIN
-                                selectedMenuItem = 0
-                            }
-                        }
+                    else -> return
+                }
+                menuSwitchCooldown = 0.25
+                inputSystem.clearInputs()
+            }
+            if (inputSystem.shootInput && currentMenu == MenuType.SETTINGS) {
+                changingMenuItem = !changingMenuItem
+                menuSwitchCooldown = 0.1
+                if(selectedMenuItem == 5){
+                    currentMenu = MenuType.MAIN
+                    selectedMenuItem = 0
+                    changingMenuItem = false
+                }
+                inputSystem.clearInputs()
+            }
+            if (inputSystem.movementInput != 0f && changingMenuItem && currentMenu == MenuType.SETTINGS) {
+                when (selectedMenuItem) {
+
+                    0 -> settingsManager.fov += 1f * inputSystem.movementInput
+                    1 -> settingsManager.rayCount += 16 * inputSystem.movementInput.toInt()
+                    2 -> settingsManager.buttonAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
+                    3 -> settingsManager.gyroAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
+                    4 -> settingsManager.tiltAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
+                    else ->{
+                            currentMenu = MenuType.MAIN
+                            selectedMenuItem = 0
                     }
                 }
+                menuSwitchCooldown = 0.1
             }
+
         }
+
+    }
+
+    fun updateState(dt: Double, inputSystem: InputSystem) {
+        menuSwitchCooldown -= dt
+        updateMenu(dt, inputSystem)
+
         if (inputSystem.mapInput && currentState == StateEnum.GAME) {
             currentState = StateEnum.MAP
         }

@@ -9,22 +9,21 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameInstance: GameInstanc
     var frames = 0
     var FPS = 0
     var updateMili = 0
+
     //short for delta time
-    val dt get() = updateMili.toDouble()/1000.0
+    val dt get() = updateMili.toDouble() / 1000.0
     var lastMili = 0
     var secondTimer = System.currentTimeMillis()
-    override fun run(){
-        while (running)
-        {
+    override fun run() {
+        while (running) {
 
 
             frames++
             val currentTime = System.currentTimeMillis()
-            updateMili = (currentTime-lastMili).toInt()
+            updateMili = (currentTime - lastMili).toInt()
             lastMili = currentTime.toInt()
 
-            if (currentTime - secondTimer > 1000)
-            {
+            if (currentTime - secondTimer > 1000) {
                 Log.d("Game", "Framerate: $frames")
                 FPS = frames
                 frames = 0
@@ -32,8 +31,8 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameInstance: GameInstanc
             }
 
             val canvas: Canvas? = surfaceHolder.lockCanvas()
-            if (canvas != null){
-                synchronized(surfaceHolder){
+            if (canvas != null) {
+                synchronized(surfaceHolder) {
                     gameInstance.draw(canvas)
                 }
                 surfaceHolder.unlockCanvasAndPost(canvas)

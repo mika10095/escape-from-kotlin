@@ -71,7 +71,6 @@ class RayCaster {
         }
 
 
-
         val perpDist =
             if (side == 0)
                 sideDistX - deltaDistX
