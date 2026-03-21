@@ -4,7 +4,7 @@ import android.graphics.Canvas
 import android.util.Log
 import android.view.SurfaceHolder
 
-class GameThread(val surfaceHolder: SurfaceHolder, val gameInstance: GameInstance) : Thread() {
+class GameThread(val surfaceHolder: SurfaceHolder, val game: Game) : Thread() {
     var running = false
     var frames = 0
     var FPS = 0
@@ -33,7 +33,7 @@ class GameThread(val surfaceHolder: SurfaceHolder, val gameInstance: GameInstanc
             val canvas: Canvas? = surfaceHolder.lockCanvas()
             if (canvas != null) {
                 synchronized(surfaceHolder) {
-                    gameInstance.draw(canvas)
+                    game.draw(canvas)
                 }
                 surfaceHolder.unlockCanvasAndPost(canvas)
             }

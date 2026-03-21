@@ -8,14 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.mika10095.escapefromkotlin.engine.GameInstance
+import com.mika10095.escapefromkotlin.engine.Game
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val gameInstance = GameInstance(this)
-        setContentView(gameInstance)
+        val game = Game(this)
+        setContentView(game)
         hideSystemUI()
     }
 

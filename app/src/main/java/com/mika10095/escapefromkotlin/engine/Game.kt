@@ -12,12 +12,14 @@ import com.mika10095.escapefromkotlin.input.GyroInput
 import com.mika10095.escapefromkotlin.input.InputSystem
 import com.mika10095.escapefromkotlin.input.TiltInput
 
-class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
+class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     var gameThread: GameThread? = null
     val gameState: GameState = GameState(context)
     lateinit var inputSystem: InputSystem
     lateinit var gyroInput: GyroInput
     lateinit var tiltInput: TiltInput
+
+    var shootPointerId: Int? = null
 
     init {
         gameState.init()
@@ -104,8 +106,7 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         event ?: return false
 
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN,
-            MotionEvent.ACTION_MOVE -> {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN {
                 // Reset inputs for this frame
                 var forward = false
                 var back = false
@@ -141,7 +142,8 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 }
                 inputSystem.mapInput = map
                 inputSystem.menuInput = menu
-                inputSystem.shootInput = shoot
+                if(shoot)
+                    inputSystem.pressedShoot()
             }
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
@@ -160,6 +162,9 @@ class GameInstance(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
                 if (inputSystem.turnRightButton.contains(x, y))
                     inputSystem.turnInput = 0f
+
+                if (inputSystem.shootButton.contains(x, y))
+                    inputSystem.releasedShoot()
             }
         }
 

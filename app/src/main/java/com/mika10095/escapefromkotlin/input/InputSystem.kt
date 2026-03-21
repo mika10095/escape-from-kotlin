@@ -19,6 +19,19 @@ class InputSystem(width: Int, height: Int) {
     var menuInput = false
     var movementInput = 0f
     var shootInput = false
+    var shootInputReset = true
+
+    fun pressedShoot() {
+        if (shootInputReset) {
+            shootInput = true
+            shootInputReset = false
+        }
+    }
+
+    fun releasedShoot() {
+        shootInput = false
+        shootInputReset = true
+    }
 
     fun setSensorInput(gyroInput: GyroInput, tiltInput: TiltInput)
     {
@@ -42,5 +55,6 @@ class InputSystem(width: Int, height: Int) {
         shootInput = false
         mapInput = false
         menuInput = false
+        shootInputReset = true
     }
 }

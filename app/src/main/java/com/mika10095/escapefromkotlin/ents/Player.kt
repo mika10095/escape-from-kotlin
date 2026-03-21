@@ -32,11 +32,9 @@ class Player: EntityBase() {
         if (!state.gameMap.isWallCircle(posx, posy + moveY, radius)) {
             posy += moveY
         }
-        rot += inputSystem.turnInputGravity * dt.toFloat() * turnspeed
-        rot -= inputSystem.turnInputGyro * dt.toFloat() * turnspeed/2
-        rot += inputSystem.turnInput * dt.toFloat() * turnspeed
-        if (rot < 0f) rot += (2 * Math.PI).toFloat()
-        if (rot > (2 * Math.PI).toFloat()) rot -= (2 * Math.PI).toFloat()
+        rot += inputSystem.turnInputGravity * dt.toFloat() * state.settingsManager.tiltAimSens
+        rot -= inputSystem.turnInputGyro * dt.toFloat() *  state.settingsManager.gyroAimSens
+        rot += inputSystem.turnInput * dt.toFloat() *  state.settingsManager.buttonAimSens
     }
 
 

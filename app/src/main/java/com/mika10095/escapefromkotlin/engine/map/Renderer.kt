@@ -13,6 +13,8 @@ import androidx.core.graphics.scale
 import com.mika10095.escapefromkotlin.R
 import com.mika10095.escapefromkotlin.engine.GameState
 import com.mika10095.escapefromkotlin.engine.raycast.RayCaster
+import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -52,8 +54,8 @@ class Renderer(context: Context) {
 
         val paint = Paint()
 
-        val rays = 128
-        val fov = Math.toRadians(72.0).toFloat()
+        val rays = state.settingsManager.rayCount
+        val fov = Math.toRadians(state.settingsManager.fov.toDouble()).toFloat()
 
         val screenW = canvas.width.toFloat()
         val screenH = canvas.height.toFloat()
@@ -127,7 +129,7 @@ class Renderer(context: Context) {
         val screenW = canvas.width.toFloat()
         val screenH = canvas.height.toFloat()
 
-        val fov = Math.toRadians(72.0).toFloat()
+        val fov = Math.toRadians(state.settingsManager.fov.toDouble()).toFloat()
 
         for (enemy in enemies) {
             if (!enemy.visible) continue
@@ -135,17 +137,13 @@ class Renderer(context: Context) {
             val dx = enemy.posx - player.posx
             val dy = enemy.posy - player.posy
 
-            val distance = sqrt(dx * dx + dy * dy).toFloat()
+            val distance = sqrt(dx * dx + dy * dy)
 
-            val angleToEnemy = kotlin.math.atan2(dy, dx)
+            val angleToEnemy = atan2(dy, dx)
 
-            var angleDiff = angleToEnemy - player.rot
+            val angleDiff = angleToEnemy - player.rot
 
-            while (angleDiff < -Math.PI) angleDiff += (2 * Math.PI).toFloat()
-            while (angleDiff > Math.PI) angleDiff -= (2 * Math.PI).toFloat()
-
-
-            if (kotlin.math.abs(angleDiff) > fov / 2) continue
+            if (abs(angleDiff) > fov / 2) continue
 
             var diff = angleToEnemy - enemy.rot
             while (diff > Math.PI) diff -= (2 * Math.PI).toFloat()
@@ -191,7 +189,9 @@ class Renderer(context: Context) {
         if (state.player.shooting)
             spriteId++
         val baseBitmap = weaponTextures[spriteId]
-        val scaledBitmap = baseBitmap.scale(weaponWidth.toInt(), weaponHeight.toInt(), false)
-        canvas.drawBitmap(scaledBitmap, left, top, null)
+        val scaledBitmap = baseBitmap.scale(weaponWidth.toInt(), weaponHeight.toInt(), true)
+        val paint = Paint()
+        paint.isFilterBitmap = false
+        canvas.drawBitmap(scaledBitmap, left, top, paint)
     }
 }

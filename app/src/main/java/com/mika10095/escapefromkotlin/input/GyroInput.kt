@@ -14,7 +14,6 @@ class GyroInput(context: Context) : SensorEventListener {
         sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
     var yaw = 0f
-    var turn = 0f
     fun start() {
         gyro?.also {
             sensorManager.registerListener(
