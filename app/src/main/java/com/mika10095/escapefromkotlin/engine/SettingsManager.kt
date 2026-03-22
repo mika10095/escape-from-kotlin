@@ -23,6 +23,9 @@ class SettingsManager(context: Context) {
         get() = prefs.getInt("tiltAimSens", 10).toFloat() / 10f
         set(value) = prefs.edit {
             putInt("tiltAimSens", (value.coerceIn(-4f, 4f) * 10).toInt()) }
+    var debug: Boolean
+        get() = prefs.getBoolean("debug", false)
+        set(value) = prefs.edit { putBoolean("debug",value) }
     var useButtonAim: Boolean
         get() = prefs.getBoolean("useButtonAim", true)
         set(value) = prefs.edit { putBoolean("useButtonAim", value) }

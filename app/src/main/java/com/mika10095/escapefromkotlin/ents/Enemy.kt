@@ -9,14 +9,12 @@ import kotlin.math.hypot
 import kotlin.math.sign
 import kotlin.math.sin
 
-class Enemy : EntityBase() {
-    var spriteId = 0
+class Enemy(val spriteId: Int = 0,val attackRange: Float = 100f,val shootDelay: Float = 3f) : EntityBase() {
 
-    var attackRange = 100f
     var visible = false
     var shooting = false
+    var shootingStance = false
     var shootCooldown = 0f
-    val shootDelay = 0.5f
     var state = State.WANDER
     var lastSeenX = 0f
     var lastSeenY = 0f
@@ -32,6 +30,10 @@ class Enemy : EntityBase() {
     }
 
     fun update(gameState: GameState, dt: Double) {
+        super.update(dt)
+        updateVisibility(gameState)
+        if(hp == 0)
+            return
         val player = gameState.player
 
         val dx = player.posx - posx
@@ -47,7 +49,7 @@ class Enemy : EntityBase() {
             searchTimer = maxSearchTime
         }
 
-        updateVisibility(gameState)
+
 
         if (visible) {
             lastSeenX = player.posx
@@ -118,9 +120,10 @@ class Enemy : EntityBase() {
                 posy += moveY
             }
         }
-
+        Log.d("game", "Enemy angle: " + abs(Math.toDegrees(diff.toDouble())))
         // shooting
-        if (dist < attackRange) {
+        if (dist < attackRange && abs(Math.toDegrees(diff.toDouble()))<5f ) {
+            shootingStance = true
             if (shootCooldown <= 0f) {
                 shooting = true
                 shootCooldown = shootDelay
@@ -129,7 +132,9 @@ class Enemy : EntityBase() {
                 shooting = false
             }
         } else {
+            shootingStance = false
             shooting = false
+            shootCooldown = shootDelay
         }
     }
     fun search(gameState: GameState, dt: Double) {
@@ -184,8 +189,8 @@ class Enemy : EntityBase() {
         while (diff < -Math.PI) diff += (2 * Math.PI).toFloat()
 
         if (abs(diff) > fov / 2f) {
-            visible = false
-            return
+            lastSeenX = gameState.player.posx
+            lastSeenY = gameState.player.posy
         }
 
         val hit = gameState.renderer.raycaster.castRay(

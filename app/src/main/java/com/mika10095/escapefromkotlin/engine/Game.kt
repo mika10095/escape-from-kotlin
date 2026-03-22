@@ -8,13 +8,16 @@ import android.graphics.Paint
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.mika10095.escapefromkotlin.engine.map.Renderer
 import com.mika10095.escapefromkotlin.input.GyroInput
 import com.mika10095.escapefromkotlin.input.InputSystem
 import com.mika10095.escapefromkotlin.input.TiltInput
 
 class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     var gameThread: GameThread? = null
-    val gameState: GameState = GameState(context)
+    val settingsManager = SettingsManager(context)
+    val renderer = Renderer(context)
+    val gameState: GameState = GameState(settingsManager, renderer)
     lateinit var inputSystem: InputSystem
     lateinit var gyroInput: GyroInput
     lateinit var tiltInput: TiltInput
@@ -52,7 +55,8 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
         super.draw(canvas)
         canvas.drawColor(Color.BLACK)
         gameState.drawState(canvas)
-        drawDebug(canvas)
+        if(settingsManager.debug)
+            drawDebug(canvas)
         update()
     }
 
@@ -69,29 +73,17 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
         paint.color = Color.MAGENTA
         paint.textSize = 40f
         canvas.drawText(
-            "Movement: ${inputSystem.movementInput}",
-            20f,
-            250f,
-            paint
-        )
-        canvas.drawText(
-            "Gyro: ${gyroInput.yaw}",
-            20f,
-            150f,
-            paint
-        )
-        canvas.drawText(
-            "Turn: ${tiltInput.turn} Tilt: ${tiltInput.tilt}",
-            20f,
-            200f,
-            paint
-        )
-        canvas.drawText(
             "FPS: " + gameThread?.fps.toString() + "\tUpdateMS: " + gameThread?.updateMili.toString() + "\t DT: " + gameThread?.dt.toString(),
             20f,
             100f,
             paint
         )
+        var x =  20f
+        var y =   150f
+        for (line in inputSystem.debugText().split("\n")){
+            canvas.drawText(line,x,y,paint)
+            y += paint.descent() - paint.ascent();
+        }
     }
 
     fun update() {

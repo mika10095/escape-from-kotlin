@@ -9,6 +9,7 @@ class Player: EntityBase() {
     var shooting = false
     var startedShooting = 0.0
     fun update(state: GameState,inputSystem: InputSystem, dt: Double) {
+        super.update(dt)
         if(state.gameMap.tileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot))==4 && inputSystem.shootInput){
             state.gameMap.setTileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot),0)
             inputSystem.shootInput = false

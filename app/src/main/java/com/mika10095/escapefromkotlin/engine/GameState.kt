@@ -1,6 +1,5 @@
 package com.mika10095.escapefromkotlin.engine
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -9,13 +8,14 @@ import com.mika10095.escapefromkotlin.engine.map.Renderer
 import com.mika10095.escapefromkotlin.ents.Enemy
 import com.mika10095.escapefromkotlin.ents.Player
 import com.mika10095.escapefromkotlin.input.InputSystem
+import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.roundToInt
+import kotlin.math.hypot
 import kotlin.math.sin
+import kotlin.random.Random
 
-class GameState(context: Context) {
-    val settingsManager = SettingsManager(context)
-    val renderer = Renderer(context)
+class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
+
     val player = Player()
     val enemies = mutableListOf<Enemy>()
     val gameMap = GameMap(
@@ -61,13 +61,8 @@ class GameState(context: Context) {
         "Button Aim Sens",
         "Gyro Aim Sens",
         "Tilt Aim Sens",
+        "Debug Mode",
         "Back"
-    )
-    val gyroOptions = listOf(
-        "Full Aim + Map",
-        "Full Aim",
-        "Tilt Only Aim",
-        "Turn Only Aim"
     )
 
     fun init() {
@@ -98,9 +93,11 @@ class GameState(context: Context) {
             renderer.draw(this, canvas)
             renderer.drawEnemies(this, canvas)
             renderer.drawWeapon(this, canvas)
-            drawMap(canvas)
-            drawPlayer(canvas)
-            drawEnemies(canvas)
+            if(settingsManager.debug) {
+                drawMap(canvas)
+                drawPlayer(canvas)
+                drawEnemies(canvas)
+            }
         }
         if (currentState == StateEnum.MAP) {
             drawMap(canvas)
@@ -141,6 +138,7 @@ class GameState(context: Context) {
                     2 -> " : ${settingsManager.buttonAimSens}"
                     3 -> " : ${settingsManager.gyroAimSens}"
                     4 -> " : ${settingsManager.tiltAimSens}"
+                    5 -> " : ${settingsManager.debug}"
                     else -> ""
                 }
             } else ""
@@ -198,7 +196,7 @@ class GameState(context: Context) {
         for (y in 0..<gameMap.height) {
             for (x in 0..<gameMap.width) {
                 val index = y * gameMap.width + x
-                if (gameMap.map[index] == 1) {
+                if (gameMap.isWall(x,y)) {
                     paint.color = Color.RED
 
                     val left = gameMap.posX + x * gameMap.tileSize
@@ -258,7 +256,7 @@ class GameState(context: Context) {
             if (inputSystem.shootInput && currentMenu == MenuType.SETTINGS) {
                 changingMenuItem = !changingMenuItem
                 menuSwitchCooldown = 0.1
-                if(selectedMenuItem == 5){
+                if(selectedMenuItem == 6){
                     currentMenu = MenuType.MAIN
                     selectedMenuItem = 0
                     changingMenuItem = false
@@ -273,6 +271,7 @@ class GameState(context: Context) {
                     2 -> settingsManager.buttonAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
                     3 -> settingsManager.gyroAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
                     4 -> settingsManager.tiltAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
+                    5 -> settingsManager.debug = inputSystem.movementInput > 0
                     else ->{
                             currentMenu = MenuType.MAIN
                             selectedMenuItem = 0
@@ -332,17 +331,17 @@ class GameState(context: Context) {
             val dx = enemy.posx - px
             val dy = enemy.posy - py
 
-            val dist = kotlin.math.hypot(dx.toDouble(), dy.toDouble()).toFloat()
-            
-            val dot = dx * kotlin.math.cos(angle) + dy * kotlin.math.sin(angle)
+            val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
+
+            val dot = dx * cos(angle) + dy * sin(angle)
 
             if (dot < 0) continue
 
-            val perpDist = kotlin.math.abs(
-                dx * kotlin.math.sin(angle) - dy * kotlin.math.cos(angle)
+            val perpDist = abs(
+                dx * sin(angle) - dy * cos(angle)
             )
 
-            if (perpDist < enemy.radius) {
+            if (perpDist < enemy.radius && enemy.hp > 0) {
                 if (dist < rayHit.distance && dist < closestDist) {
                     closestDist = dist
                     closestEnemy = enemy
@@ -350,6 +349,6 @@ class GameState(context: Context) {
             }
         }
 
-        closestEnemy?.takeDamage(34)
+        closestEnemy?.takeDamage(Random.nextInt(10,30))
     }
 }

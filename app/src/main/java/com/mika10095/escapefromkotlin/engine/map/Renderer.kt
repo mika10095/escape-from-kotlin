@@ -8,6 +8,7 @@ import android.graphics.LightingColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
+import android.util.Log
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import com.mika10095.escapefromkotlin.R
@@ -38,8 +39,9 @@ class Renderer(context: Context) {
         BitmapFactory.decodeResource(context.resources, R.drawable.enemy_2),
         BitmapFactory.decodeResource(context.resources, R.drawable.enemy_3),
         BitmapFactory.decodeResource(context.resources, R.drawable.enemy_4),
-        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_shoot)
-
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_shoot_ready),
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_shoot),
+        BitmapFactory.decodeResource(context.resources, R.drawable.enemy_dead)
     )
     val weaponTextures = arrayOf(
         BitmapFactory.decodeResource(context.resources, R.drawable.pistol_shoot_1),
@@ -151,12 +153,15 @@ class Renderer(context: Context) {
             val spriteAngle = Math.toDegrees(diff.toDouble()).toFloat()
 
             val sprite = when {
-                enemy.shooting -> 4
-                spriteAngle > -45 && spriteAngle <= 45 -> 2     // front
+                enemy.hp == 0 -> 6
+                enemy.shooting -> 5
+                enemy.shootingStance -> 4
+                spriteAngle > -45 && spriteAngle <= 45 -> 2     // back
                 spriteAngle > 45 && spriteAngle <= 135 -> 3     // left
                 spriteAngle <= -45 && spriteAngle > -135 -> 1   // right
-                else -> 0                      // back
+                else -> 0                      // front
             }
+            Log.d("game", sprite.toString())
             val screenX =
                 (0.5f + angleDiff / fov) * screenW
 

@@ -61,4 +61,13 @@ class InputSystem(width: Int, height: Int) {
         menuInput = false
         shootInputReset = true
     }
+    fun debugText(): String
+    {
+        return("GyroTurn = $turnInputGyro \n " +
+                "TiltTurn = $turnInputGravity \n" +
+                "ButtonTurn = $turnInput \n" +
+                "Movement = $movementInput \n" +
+                "Shoot = $shootInput Reset = $shootInputReset \n" +
+                "Menu = $menuInput Map = $mapInput MapGravity = $mapInputGravity \n ")
+    }
 }
