@@ -181,8 +181,8 @@ class Renderer(context: Context) {
     }
 
     fun drawWeapon(state: GameState, canvas: Canvas) {
-        val weaponWidth = 64f * 16
-        val weaponHeight = 64f * 16
+        val weaponWidth = 64f*16
+        val weaponHeight = 64f*16
 
         val left = (canvas.width - weaponWidth) / 2f   // center horizontally
         val top = canvas.height - weaponHeight         // bottom of screen
