@@ -72,9 +72,10 @@ class GameState(context: Context) {
 
     fun init() {
         val enemy1 = Enemy()
-        enemy1.setPosition(1000f, 555f)
+        enemy1.setPosition(1250f, 400f)
+        enemy1.speed = 100f
+        enemy1.turnspeed = 2f
         enemies.add(enemy1)
-        settingsManager.clearPrefs()
     }
 
     fun drawState(canvas: Canvas) {
@@ -97,6 +98,9 @@ class GameState(context: Context) {
             renderer.draw(this, canvas)
             renderer.drawEnemies(this, canvas)
             renderer.drawWeapon(this, canvas)
+            drawMap(canvas)
+            drawPlayer(canvas)
+            drawEnemies(canvas)
         }
         if (currentState == StateEnum.MAP) {
             drawMap(canvas)
@@ -297,14 +301,55 @@ class GameState(context: Context) {
             inputSystem.clearInputs()
         }
         if (currentState == StateEnum.GAME) {
+            player.update(this, inputSystem, dt)
             for (enemy in enemies) {
                 enemy.update(this, dt)
-                player.update(this, inputSystem, dt)
             }
+            enemies.removeAll { it.dead }
         }
         if (currentState == StateEnum.MAP) {
 
         }
 
+    }
+
+    fun playerShoot() {
+        val px = player.posx
+        val py = player.posy
+        val angle = player.rot
+
+        val rayHit = renderer.raycaster.castRay(
+            px,
+            py,
+            angle,
+            gameMap
+        )
+
+        var closestEnemy: Enemy? = null
+        var closestDist = Float.MAX_VALUE
+
+        for (enemy in enemies) {
+            val dx = enemy.posx - px
+            val dy = enemy.posy - py
+
+            val dist = kotlin.math.hypot(dx.toDouble(), dy.toDouble()).toFloat()
+            
+            val dot = dx * kotlin.math.cos(angle) + dy * kotlin.math.sin(angle)
+
+            if (dot < 0) continue
+
+            val perpDist = kotlin.math.abs(
+                dx * kotlin.math.sin(angle) - dy * kotlin.math.cos(angle)
+            )
+
+            if (perpDist < enemy.radius) {
+                if (dist < rayHit.distance && dist < closestDist) {
+                    closestDist = dist
+                    closestEnemy = enemy
+                }
+            }
+        }
+
+        closestEnemy?.takeDamage(34)
     }
 }

@@ -7,7 +7,7 @@ import android.view.SurfaceHolder
 class GameThread(val surfaceHolder: SurfaceHolder, val game: Game) : Thread() {
     var running = false
     var frames = 0
-    var FPS = 0
+    var fps = 0
     var updateMili = 0
 
     //short for delta time
@@ -25,7 +25,7 @@ class GameThread(val surfaceHolder: SurfaceHolder, val game: Game) : Thread() {
 
             if (currentTime - secondTimer > 1000) {
                 Log.d("Game", "Framerate: $frames")
-                FPS = frames
+                fps = frames
                 frames = 0
                 secondTimer = currentTime
             }

@@ -1,56 +1,200 @@
 package com.mika10095.escapefromkotlin.ents
 
+import android.util.Log
 import com.mika10095.escapefromkotlin.engine.GameState
-import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
-import kotlin.math.sqrt
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sign
+import kotlin.math.sin
 
 class Enemy : EntityBase() {
     var spriteId = 0
+
     var attackRange = 100f
     var visible = false
     var shooting = false
+    var shootCooldown = 0f
+    val shootDelay = 0.5f
+    var state = State.WANDER
+    var lastSeenX = 0f
+    var lastSeenY = 0f
+    var searchTimer = 0f
+    val maxSearchTime = 3f
+    val viewDistance = 1024f
+    val hearingRange = 256f
+    val fov = Math.toRadians(90.0).toFloat()
+    enum class State {
+        WANDER,
+        CHASE,
+        SEARCH
+    }
 
-    fun update(gameState: GameState, dt: Double)
-    {
+    fun update(gameState: GameState, dt: Double) {
+        val player = gameState.player
+
+        val dx = player.posx - posx
+        val dy = player.posy - posy
+        val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
+
+        shootCooldown -= dt.toFloat()
+
+        if (player.shooting && dist < hearingRange) {
+            lastSeenX = player.posx
+            lastSeenY = player.posy
+            state = State.SEARCH
+            searchTimer = maxSearchTime
+        }
+
         updateVisibility(gameState)
-        if(visible)
-        {
-            val dx = posx - gameState.player.posx
-            val dy = posy - gameState.player.posy
 
-            val targetAngle = atan2(dy, dx)
+        if (visible) {
+            lastSeenX = player.posx
+            lastSeenY = player.posy
+            state = State.CHASE
+            searchTimer = maxSearchTime
+        }
 
-            val diff = targetAngle - rot
-            if(abs(PI.toFloat()-abs(diff))>0.05f){
-                shooting = false
-                if (diff < 0) {
-                    rot += turnspeed * dt.toFloat()
-                } else {
-                    rot -= turnspeed * dt.toFloat()
-                }
+        if (state == State.SEARCH) {
+            searchTimer -= dt.toFloat()
+            if (searchTimer <= 0f) {
+                state = State.WANDER
             }
-            if(attackRange < sqrt(dx.toDouble()*dy))
-                shooting = true
+        }
+
+        when (state) {
+            State.WANDER -> wander(gameState, dt)
+            State.CHASE -> chase(gameState, dt)
+            State.SEARCH -> search(gameState, dt)
         }
     }
 
-    fun updateVisibility(gameState: GameState)
-    {
-        val dx = posx - gameState.player.posx
-        val dy = posy - gameState.player.posy
+    fun wander(gameState: GameState, dt: Double) {
+        rot += (Math.random().toFloat() - 0.5f) * turnspeed * dt.toFloat() * 3f
 
-        val angle = atan2(dy, dx)
-        val distToEnemy = sqrt(dx*dx + dy*dy)
-        // uhh, this raycast line is kinda ugly I should do something about it
+        val moveSpeed = speed * 0.1f
+
+        val moveX = cos(rot) * moveSpeed * dt.toFloat()
+        val moveY = sin(rot) * moveSpeed * dt.toFloat()
+        if (!gameState.gameMap.isWallCircle(posx + moveX, posy, radius)) {
+            posx += moveX
+        }
+        if (!gameState.gameMap.isWallCircle(posx, posy + moveY, radius)) {
+            posy += moveY
+        }
+    }
+
+    fun chase(gameState: GameState, dt: Double) {
+        val player = gameState.player
+        val dx = player.posx - posx
+        val dy = player.posy - posy
+
+        val targetAngle = atan2(dy, dx)
+        rotateTowards(targetAngle, dt)
+
+        val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
+
+        val diff = angleDiff(targetAngle, rot)
+
+        if (cos(diff.toDouble()) < 0) {
+            return
+        }
+
+        val moveFactor = when {
+            abs(diff) < 0.2f -> 1f
+            abs(diff) < 0.6f -> 0.5f
+            else -> 0.1f
+        }
+
+        if (dist > attackRange) {
+            val moveX = cos(rot) * speed * moveFactor * dt.toFloat()
+            val moveY = sin(rot) * speed * moveFactor * dt.toFloat()
+
+            if (!gameState.gameMap.isWallCircle(posx + moveX, posy, radius)) {
+                posx += moveX
+            }
+            if (!gameState.gameMap.isWallCircle(posx, posy + moveY, radius)) {
+                posy += moveY
+            }
+        }
+
+        // shooting
+        if (dist < attackRange) {
+            if (shootCooldown <= 0f) {
+                shooting = true
+                shootCooldown = shootDelay
+                Log.d("game", "Player got hit")
+            } else {
+                shooting = false
+            }
+        } else {
+            shooting = false
+        }
+    }
+    fun search(gameState: GameState, dt: Double) {
+        val dx = lastSeenX - posx
+        val dy = lastSeenY - posy
+
+        val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
+
+        if (dist < 10f) return
+
+        val targetAngle = atan2(dy, dx)
+        rotateTowards(targetAngle, dt)
+
+        var diff = angleDiff(targetAngle,rot)
+
+        if (abs(diff) < 0.5f) {
+            val moveX = cos(rot) * speed * dt.toFloat()
+            val moveY = sin(rot) * speed * dt.toFloat()
+
+            if (!gameState.gameMap.isWallCircle(posx + moveX, posy, radius)) {
+                posx += moveX
+            }
+            if (!gameState.gameMap.isWallCircle(posx, posy + moveY, radius)) {
+                posy += moveY
+            }
+        }
+    }
+    fun rotateTowards(target: Float, dt: Double) {
+        var diff = target - rot
+
+        while (diff > Math.PI) diff -= (2 * Math.PI).toFloat()
+        while (diff < -Math.PI) diff += (2 * Math.PI).toFloat()
+
+        if (abs(diff) > 0.05f) {
+            rot += sign(x = diff) * turnspeed * dt.toFloat()
+        }
+    }
+    fun updateVisibility(gameState: GameState) {
+        val dx = gameState.player.posx - posx
+        val dy = gameState.player.posy - posy
+
+        val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
+        if (dist > viewDistance) {
+            visible = false
+            return
+        }
+
+        val angleToPlayer = atan2(dy, dx)
+
+        var diff = angleToPlayer - rot
+        while (diff > Math.PI) diff -= (2 * Math.PI).toFloat()
+        while (diff < -Math.PI) diff += (2 * Math.PI).toFloat()
+
+        if (abs(diff) > fov / 2f) {
+            visible = false
+            return
+        }
+
         val hit = gameState.renderer.raycaster.castRay(
-            gameState.player.posx,
-            gameState.player.posy,
-            angle,
+            posx,
+            posy,
+            angleToPlayer,
             gameState.gameMap
         )
 
-        visible = hit.distance >= distToEnemy
+        visible = hit.distance >= dist
     }
 }

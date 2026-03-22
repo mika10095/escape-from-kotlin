@@ -17,6 +17,7 @@ class Player: EntityBase() {
         {
             startedShooting = 0.2
             shooting = true
+            state.playerShoot()
             inputSystem.shootInput = false
         }
         startedShooting-=dt

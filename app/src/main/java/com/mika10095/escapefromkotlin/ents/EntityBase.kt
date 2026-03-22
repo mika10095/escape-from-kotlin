@@ -1,7 +1,11 @@
 package com.mika10095.escapefromkotlin.ents
 
+import android.util.Log
+
 @Suppress("SpellCheckingInspection")
 abstract class EntityBase{
+    var hp = 100
+    val dead get() = hp == 0
     var posx = 0f
     var posy = 0f
     var rot = 0f
@@ -21,5 +25,17 @@ abstract class EntityBase{
     {
         posx = x
         posy = y
+    }
+    fun takeDamage(damage: Int)
+    {
+        hp -= damage
+        hp = hp.coerceIn(0,Int.MAX_VALUE)
+        Log.d("game", "taken damage current HP: " + hp)
+    }
+    fun angleDiff(a: Float, b: Float): Float {
+        var diff = a - b
+        while (diff > Math.PI) diff -= (2 * Math.PI).toFloat()
+        while (diff < -Math.PI) diff += (2 * Math.PI).toFloat()
+        return diff
     }
 }

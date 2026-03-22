@@ -87,7 +87,7 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
             paint
         )
         canvas.drawText(
-            "FPS: " + gameThread?.FPS.toString() + "\tUpdateMS: " + gameThread?.updateMili.toString() + "\t DT: " + gameThread?.dt.toString(),
+            "FPS: " + gameThread?.fps.toString() + "\tUpdateMS: " + gameThread?.updateMili.toString() + "\t DT: " + gameThread?.dt.toString(),
             20f,
             100f,
             paint
@@ -104,17 +104,42 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
-
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN {
-                // Reset inputs for this frame
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
+
+                val index = event.actionIndex
+                val pointerId = event.getPointerId(index)
+                val x = event.getX(index)
+                val y = event.getY(index)
+
+                if (inputSystem.shootButton.contains(x, y) && shootPointerId == null) {
+                    //stupid shenanigans for such an important button...
+                    shootPointerId = pointerId
+                    inputSystem.pressedShoot()
+                }
+                if (inputSystem.forwardButton.contains(x, y)) {
+                    inputSystem.movementInput = 1f
+                } else if (inputSystem.backButton.contains(x, y)) {
+                    inputSystem.movementInput = -1f
+                }
+                if (inputSystem.turnLeftButton.contains(x, y)) {
+                    inputSystem.turnInput = -1f
+                } else if (inputSystem.turnRightButton.contains(x, y)) {
+                    inputSystem.turnInput = 1f
+                }
+                if (inputSystem.mapButton.contains(x, y)) {
+                    inputSystem.mapInputScreen = !inputSystem.mapInputScreen
+                }
+                if (inputSystem.menuButton.contains(x, y)) {
+                    inputSystem.menuInput = true
+                }
+            }
+
+            MotionEvent.ACTION_MOVE -> {
                 var forward = false
                 var back = false
-                var shoot = false
                 var left = false
                 var right = false
-                var map = false
-                var menu = false
 
                 for (i in 0 until event.pointerCount) {
                     val x = event.getX(i)
@@ -122,14 +147,9 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
 
                     if (inputSystem.forwardButton.contains(x, y)) forward = true
                     if (inputSystem.backButton.contains(x, y)) back = true
-                    if (inputSystem.shootButton.contains(x, y)) shoot = true
                     if (inputSystem.turnLeftButton.contains(x, y)) left = true
                     if (inputSystem.turnRightButton.contains(x, y)) right = true
-                    if (inputSystem.mapButton.contains(x, y)) map = true
-                    if (inputSystem.menuButton.contains(x, y)) menu = true
                 }
-
-                // Apply inputs
                 inputSystem.movementInput = when {
                     forward -> 1f
                     back -> -1f
@@ -140,31 +160,48 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
                     left -> -1f
                     else -> 0f
                 }
-                inputSystem.mapInput = map
-                inputSystem.menuInput = menu
-                if(shoot)
-                    inputSystem.pressedShoot()
+
+                shootPointerId?.let { id ->
+                    val index = event.findPointerIndex(id)
+
+                    if (index == -1) {
+                        inputSystem.releasedShoot()
+                        shootPointerId = null
+                    } else {
+                        val x = event.getX(index)
+                        val y = event.getY(index)
+
+                        if (!inputSystem.shootButton.contains(x, y)) {
+                            inputSystem.releasedShoot()
+                            shootPointerId = null
+                        }
+                    }
+                }
             }
 
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_POINTER_UP,
+            MotionEvent.ACTION_CANCEL -> {
+
                 val index = event.actionIndex
+                val pointerId = event.getPointerId(index)
                 val x = event.getX(index)
                 val y = event.getY(index)
 
-                if (inputSystem.forwardButton.contains(x, y))
-                    inputSystem.movementInput = 0f
-
-                if (inputSystem.backButton.contains(x, y))
-                    inputSystem.movementInput = 0f
-
-                if (inputSystem.turnLeftButton.contains(x, y))
-                    inputSystem.turnInput = 0f
-
-                if (inputSystem.turnRightButton.contains(x, y))
-                    inputSystem.turnInput = 0f
-
-                if (inputSystem.shootButton.contains(x, y))
+                if (pointerId == shootPointerId) {
                     inputSystem.releasedShoot()
+                    shootPointerId = null
+                }
+                if (inputSystem.forwardButton.contains(x, y) ||
+                    inputSystem.backButton.contains(x, y)
+                ) {
+                    inputSystem.movementInput = 0f
+                }
+                if (inputSystem.turnLeftButton.contains(x, y) ||
+                    inputSystem.turnRightButton.contains(x, y)
+                ) {
+                    inputSystem.turnInput = 0f
+                }
             }
         }
 

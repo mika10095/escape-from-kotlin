@@ -15,7 +15,10 @@ class InputSystem(width: Int, height: Int) {
     var turnInputGyro = 0f
     var turnInputGravity = 0f
     var turnInput = 0f
-    var mapInput = false
+    val mapInput get() = mapInputScreen || mapInputGravity
+    var mapInputScreen = false
+    var mapInputGravity = false
+    
     var menuInput = false
     var movementInput = 0f
     var shootInput = false
@@ -42,9 +45,9 @@ class InputSystem(width: Int, height: Int) {
         if (abs(tiltInput.turn) > 0.05 )
         {turnInputGravity = tiltInput.turn}
         if(tiltInput.tilt < 1f)
-            mapInput = true
+            mapInputGravity = true
         if(tiltInput.tilt >= 1f)
-            mapInput = false
+            mapInputGravity = false
     }
     fun clearInputs()
     {
@@ -53,7 +56,8 @@ class InputSystem(width: Int, height: Int) {
         turnInput = 0f
         movementInput = 0f
         shootInput = false
-        mapInput = false
+        mapInputGravity = false
+        mapInputScreen = false
         menuInput = false
         shootInputReset = true
     }
