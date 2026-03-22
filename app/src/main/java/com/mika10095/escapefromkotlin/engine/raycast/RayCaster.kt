@@ -1,5 +1,6 @@
 package com.mika10095.escapefromkotlin.engine.raycast
 
+import android.util.Log
 import com.mika10095.escapefromkotlin.engine.map.GameMap
 import kotlin.math.abs
 import kotlin.math.cos
@@ -84,11 +85,10 @@ class RayCaster {
                 (relX + perpDist * dirX) / tile
 
         val wallXFrac = wallX - floor(wallX)
-
         return RayHit(
             perpDist,
             wallXFrac,
-            map.map[mapY * map.width + mapX],
+            map.tileAt(mapX,mapY),
             side
         )
     }

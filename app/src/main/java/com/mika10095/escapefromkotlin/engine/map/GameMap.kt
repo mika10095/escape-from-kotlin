@@ -1,6 +1,19 @@
 package com.mika10095.escapefromkotlin.engine.map
 
 class GameMap(x: Int, y: Int, mapValues: Array<Int>) {
+        data object Tile {
+            const val EMPTY = 0
+            const val WALL = 1
+            const val SECRET_WALL = 2
+            const val DOOR = 3
+            const val DOOR_OPEN = -103
+            const val SECRET_DOOR = 4
+            const val SECRET_DOOR_OPEN = -104
+            const val EXIT = 5
+            const val PLAYER = -1
+            const val ENEMY_1 = -2
+        }
+    var tiles = Tile
     var width = x
     var height = y
     var tileSize = 64f
@@ -12,7 +25,12 @@ class GameMap(x: Int, y: Int, mapValues: Array<Int>) {
         posX = x
         posY = y
     }
-
+    fun setMap(x: Int, y: Int, mapValues: Array<Int>)
+    {
+        width = x
+        height = y
+        map = mapValues
+    }
     fun setTileAt(x: Int, y: Int, value: Int) {
 
         if (x < 0 || y < 0 || x >= width || y >= height)
@@ -47,7 +65,6 @@ class GameMap(x: Int, y: Int, mapValues: Array<Int>) {
 
         if (x < 0 || y < 0 || x >= width || y >= height)
             return true
-
         return map[y * width + x] > 0
     }
 

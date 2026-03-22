@@ -30,6 +30,7 @@ class Renderer(context: Context) {
         BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
         BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
         BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
+        BitmapFactory.decodeResource(context.resources, R.drawable.door_default),
         BitmapFactory.decodeResource(context.resources, R.drawable.wall_brick),
         BitmapFactory.decodeResource(context.resources, R.drawable.door_default)
 
@@ -111,7 +112,7 @@ class Renderer(context: Context) {
             dstRect.right = x + columnWidth
             dstRect.bottom = bottom
 
-            val shade = ((1f - corrected / 512f) * 255f).toInt().coerceIn(0, 255)
+            val shade = ((1f - corrected / 1024) * 255f).toInt().coerceIn(0, 255)
             paint.colorFilter = LightingColorFilter(Color.rgb(shade, shade, shade), 0)
             paint.isFilterBitmap = false
 
@@ -181,22 +182,18 @@ class Renderer(context: Context) {
     }
 
     fun drawWeapon(state: GameState, canvas: Canvas) {
-        val weaponWidth = 64f*16
-        val weaponHeight = 64f*16
+        val weaponWidth = 1024f
+        val weaponHeight = 1024f
 
         val left = (canvas.width - weaponWidth) / 2f   // center horizontally
         val top = canvas.height - weaponHeight         // bottom of screen
         val right = left + weaponWidth
         val bottom = canvas.height.toFloat()
 
-        RectF(left, top, right, bottom)
+
         var spriteId = 0
         if (state.player.shooting)
             spriteId++
-        val baseBitmap = weaponTextures[spriteId]
-        val scaledBitmap = baseBitmap.scale(weaponWidth.toInt(), weaponHeight.toInt(), true)
-        val paint = Paint()
-        paint.isFilterBitmap = false
-        canvas.drawBitmap(scaledBitmap, left, top, paint)
+        canvas.drawBitmap(weaponTextures[spriteId],  null,RectF(left, top, right, bottom), null)
     }
 }

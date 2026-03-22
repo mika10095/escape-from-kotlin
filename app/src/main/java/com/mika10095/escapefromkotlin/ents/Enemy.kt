@@ -9,7 +9,7 @@ import kotlin.math.hypot
 import kotlin.math.sign
 import kotlin.math.sin
 
-class Enemy(val spriteId: Int = 0,val attackRange: Float = 100f,val shootDelay: Float = 3f) : EntityBase() {
+class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBase() {
 
     var visible = false
     var shooting = false
@@ -109,7 +109,7 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 100f,val shootDelay: 
             else -> 0.1f
         }
 
-        if (dist > attackRange) {
+        if (dist > attackRange || !visible) {
             val moveX = cos(rot) * speed * moveFactor * dt.toFloat()
             val moveY = sin(rot) * speed * moveFactor * dt.toFloat()
 
@@ -122,7 +122,7 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 100f,val shootDelay: 
         }
         Log.d("game", "Enemy angle: " + abs(Math.toDegrees(diff.toDouble())))
         // shooting
-        if (dist < attackRange && abs(Math.toDegrees(diff.toDouble()))<5f ) {
+        if (dist < attackRange && abs(Math.toDegrees(diff.toDouble()))<5f && visible) {
             shootingStance = true
             if (shootCooldown <= 0f) {
                 shooting = true

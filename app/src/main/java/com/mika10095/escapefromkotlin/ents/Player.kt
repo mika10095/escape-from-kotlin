@@ -1,5 +1,6 @@
 package com.mika10095.escapefromkotlin.ents
 
+import android.util.Log
 import com.mika10095.escapefromkotlin.engine.GameState
 import com.mika10095.escapefromkotlin.input.InputSystem
 import kotlin.math.cos
@@ -10,18 +11,27 @@ class Player: EntityBase() {
     var startedShooting = 0.0
     fun update(state: GameState,inputSystem: InputSystem, dt: Double) {
         super.update(dt)
-        if(state.gameMap.tileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot))==4 && inputSystem.shootInput){
-            state.gameMap.setTileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot),0)
+        if(state.gameMap.tileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot))==state.gameMap.tiles.DOOR && inputSystem.shootInput){
+            state.gameMap.setTileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot),state.gameMap.tiles.DOOR_OPEN)
             inputSystem.shootInput = false
         }
-        else if (inputSystem.shootInput)
+        if(state.gameMap.tileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot))==state.gameMap.tiles.SECRET_DOOR && inputSystem.shootInput){
+            state.gameMap.setTileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot),state.gameMap.tiles.SECRET_DOOR_OPEN)
+            inputSystem.shootInput = false
+        }
+        if(state.gameMap.tileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot))==state.gameMap.tiles.EXIT && inputSystem.shootInput){
+            state.resetLevel()
+            inputSystem.shootInput = false
+        }
+        else if (inputSystem.shootInput && startedShooting < 0)
         {
-            startedShooting = 0.2
+            startedShooting = 0.25
             shooting = true
             state.playerShoot()
             inputSystem.shootInput = false
         }
         startedShooting-=dt
+        Log.d("shooting","Shooting delay left: $startedShooting + are we shooting? $shooting")
         if(startedShooting < 0)
         {
             shooting = false
