@@ -4,9 +4,10 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.RectF
 import com.mika10095.escapefromkotlin.R
+import com.mika10095.escapefromkotlin.engine.SettingsManager
 import kotlin.math.abs
 
-class InputSystem(context: Context, width: Int, height: Int) {
+class InputSystem(context: Context,var settingsManager: SettingsManager, width: Int, height: Int) {
 
     val forwardButton = RectF(0f,0f,width.toFloat()/3f,height.toFloat()/2f)
     val backButton = RectF(0f,height-height.toFloat()/2f,width.toFloat()/3f,height.toFloat())
@@ -27,6 +28,12 @@ class InputSystem(context: Context, width: Int, height: Int) {
     val pistolButtonSprite = BitmapFactory.decodeResource(context.resources, R.drawable.pistol_icon)
     val shotgunButtonSprite = BitmapFactory.decodeResource(context.resources, R.drawable.shotgun_icon)
     val launcherButtonSprite = BitmapFactory.decodeResource(context.resources, R.drawable.panzerfaust_icon)
+    val healthIconHolder = RectF(0f,3f/4f*height.toFloat(),height.toFloat()/4f,height.toFloat())
+    val armorIconHolder = RectF(height.toFloat()/4f,3f/4f*height.toFloat(),2*height.toFloat()/4f,height.toFloat())
+    val ammoIconHolder = RectF(2*height.toFloat()/4f,3f/4f*height.toFloat(),3*height.toFloat()/4f,height.toFloat())
+    val healthIcon = BitmapFactory.decodeResource(context.resources, R.drawable.health_icon)
+    val armorIcon = BitmapFactory.decodeResource(context.resources, R.drawable.armor_icon)
+    val ammoIcon = BitmapFactory.decodeResource(context.resources, R.drawable.ammo_icon)
     var requestedWeapon = 1
     var turnInputGyro = 0f
     var turnInputGravity = 0f
@@ -64,6 +71,13 @@ class InputSystem(context: Context, width: Int, height: Int) {
             mapInputGravity = true
         if(tiltInput.tilt >= 1f)
             mapInputGravity = false
+        if(settingsManager.gyroAimSens == 0f)
+            turnInputGyro = 0f
+        if(settingsManager.tiltAimSens == 0f){
+            turnInputGravity = 0f
+            mapInputGravity = false
+        }
+
     }
     fun clearInputs()
     {

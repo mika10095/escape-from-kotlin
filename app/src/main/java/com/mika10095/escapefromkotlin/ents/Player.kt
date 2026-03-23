@@ -11,6 +11,7 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 class Player: EntityBase() {
+    override var hp = 50
     var score = 0
     var maxhp = 100
     var maxarmor = 100
@@ -19,16 +20,10 @@ class Player: EntityBase() {
     var shooting = false
     var startedShooting = 0.0
     var currentWeapon = 0
-    var pistolAmmo = 30
-    var pistolAmmoMax = 99
     var shotgunUnlocked = false
     var unlockShotgun = false
-    var shotgunAmmo = 0
-    var shotgunAmmoMax = 30
     var panzerfaustUnlocked = false
     var unlockPanzerfaust = false
-    var rocketAmmo = 0
-    var rocketAmmoMax = 1
 
     var weaponRanges = arrayOf(
         124f,
@@ -43,7 +38,7 @@ class Player: EntityBase() {
         200
     )
     var weaponAmmoCurrent = arrayOf(
-        99999,
+        1,
         15,
         0,
         0
@@ -165,7 +160,8 @@ class Player: EntityBase() {
                 }
             }
         }
-        weaponAmmoCurrent[currentWeapon]--
+        if (currentWeapon != 0)
+            weaponAmmoCurrent[currentWeapon]--
         val damage = ((1-(Random.nextFloat()-0.5f))*weaponDamageBase[currentWeapon]).toInt()
         Log.d("shooting","Shooting for $damage, Ammmo left ${weaponAmmoCurrent[currentWeapon]}")
         closestEnemy?.takeDamage(damage)

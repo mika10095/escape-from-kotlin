@@ -23,25 +23,25 @@ class PickupItem : EntityBase() {
         get() = when (spriteId) {
             0 -> PickupType.SHOTGUN
             1 -> PickupType.ROCKET
-            2 -> PickupType.AMMOPISTOL
-            3 -> PickupType.AMMOSHOTGUN
-            4 -> PickupType.HEALTHS
-            5 -> PickupType.HEALTHM
-            6 -> PickupType.HEALTHL
-            7 -> PickupType.ARMORS
-            8 -> PickupType.ARMORL
+            2 -> PickupType.HEALTHS
+            3 -> PickupType.HEALTHM
+            4 -> PickupType.HEALTHL
+            5 -> PickupType.ARMORS
+            6 -> PickupType.ARMORL
+            7 -> PickupType.AMMOPISTOL
+            8 -> PickupType.AMMOSHOTGUN
             9 -> PickupType.TREASURES
             10 -> PickupType.TREASUREM
             11 -> PickupType.TREASUREL
             12 -> PickupType.TREASUREXL
             13 -> PickupType.KEY
-            else -> PickupType.AMMOPISTOL
+            else -> PickupType.KEY
         }
 
     init {
         pickupable = true
         solid = false
-        radius = 14f
+        radius = 10f
     }
 
     override fun onPlayerTouch(state: GameState) {
@@ -54,8 +54,8 @@ class PickupItem : EntityBase() {
                 state.player.unlockPanzerfaust = true
                 state.player.weaponAmmoCurrent[3] = 1
             }
-            PickupType.AMMOPISTOL -> state.player.weaponAmmoCurrent[1] += 15
-            PickupType.AMMOSHOTGUN -> state.player.weaponAmmoCurrent[2] += 10
+            PickupType.AMMOPISTOL -> state.player.weaponAmmoCurrent[1] = (state.player.weaponAmmoCurrent[1]+15).coerceIn(null,state.player.weaponAmmoMax[1])
+            PickupType.AMMOSHOTGUN -> state.player.weaponAmmoCurrent[2] = (state.player.weaponAmmoCurrent[2]+10).coerceIn(null,state.player.weaponAmmoMax[2])
             PickupType.HEALTHS -> state.player.hp = (state.player.hp+15).coerceIn(null, state.player.maxhp)
             PickupType.HEALTHM -> state.player.hp = (state.player.hp+30).coerceIn(null, state.player.maxhp)
             PickupType.HEALTHL -> state.player.hp = (state.player.hp+60).coerceIn(null, state.player.maxhp)

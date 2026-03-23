@@ -434,7 +434,12 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
             inputSystem.resetWeapon()
             inputSystem.clearInputs()
         }
-
+        if(player.hp < 0)
+        {
+            player.hp = 0
+            resetLevel()
+            currentState = StateEnum.MENU
+        }
         levelTimer += dt
         menuSwitchCooldown -= dt
         updateMenu(dt, inputSystem)

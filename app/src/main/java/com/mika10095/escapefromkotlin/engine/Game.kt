@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DrawFilter
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -45,21 +46,21 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
             0,1,1,4,1,1,1,0,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,4,1,1,
             0,0,2,0,2,0,0,0,1,0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,
             1,1,1,4,1,1,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,-2,0,0,0,
-            1,-101,-103,-103,-100,1,1,1,1,0,0,0,1,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,
+            1,0,0,0,0,1,1,1,1,0,0,0,1,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,
             1,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
             1,0,-1,0,0,3,0,0,3,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,-2,0,0,0,
             1,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,3,0,-2,0,0,0,0,0,0,0,0,0,0,
-            1,-201,-202,-200,-203,1,4,1,1,0,0,0,1,0,-2,0,0,-2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
-            1,1,1,1,1,1,0,0,1,1,3,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,
-            0,0,0,0,0,2,0,0,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,
-            0,0,0,0,0,2,0,0,1,0,0,0,1,1,1,4,1,1,1,1,0,0,0,0,1,0,0,0,1,0,0,0,
-            0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,-2,0,1,1,0,0,
-            0,0,0,0,0,2,0,0,1,0,0,0,0,-2,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,
-            0,0,0,0,0,2,0,0,1,1,0,0,0,0,0,1,2,2,2,2,2,2,1,1,0,0,0,0,0,1,1,0,
-            0,0,0,0,0,2,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,
-            0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,1,0,
-            0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,1,1,0,0,0,0,0,1,1,0,
-            0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,1,1,1,5,1,1,1,0,0)
+            1,0,0,0,0,1,4,1,1,0,0,0,1,0,-2,0,0,-2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
+            1,4,1,1,1,1,0,0,1,1,3,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,
+            -200,0,0,0,-217,2,0,0,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,
+            -201,0,0,0,-216,2,0,0,1,0,0,0,1,1,1,4,1,1,1,1,0,0,0,0,1,0,0,0,1,0,0,0,
+            -202,0,0,0,-215,2,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,-2,0,1,1,0,0,
+            -203,0,0,0,-214,2,0,0,1,0,0,0,0,-2,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,
+            -204,0,0,0,-213,2,0,0,1,1,0,0,0,0,0,1,2,2,2,2,2,2,1,1,0,0,0,0,0,1,1,0,
+            -205,0,0,0,-212,2,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,
+            -206,0,0,0,-211,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,1,0,
+            -207,0,0,0,-210,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,1,1,0,0,0,0,0,1,1,0,
+            -208,0,0,0,-209,0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,1,1,1,5,1,1,1,0,0)
         )
         if (gameState.gameMap.map.size != gameState.gameMap.width * gameState.gameMap.height) {
             throw IllegalArgumentException("Map array size ${gameState.gameMap.map.size} does not match width*height (${gameState.gameMap.width*gameState.gameMap.height})")
@@ -69,7 +70,7 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     }
 
     override fun surfaceCreated(p0: SurfaceHolder) {
-        inputSystem = InputSystem(context, width, height)
+        inputSystem = InputSystem(context,settingsManager, width, height)
         gyroInput = GyroInput(context)
         tiltInput = TiltInput(context)
         gyroInput.start()
@@ -98,11 +99,11 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     }
     fun drawUI(canvas: Canvas){
         val paint = Paint()
+        paint.setTypeface(Typeface.create("Arial",Typeface.BOLD));
         paint.color = Color.argb(0.25f,1f,1f,1f)
+        if(gameState.currentState != StateEnum.MENU){
         canvas.drawBitmap(inputSystem.menuButtonSprite,null,inputSystem.menuButton, paint)
-        canvas.drawBitmap(inputSystem.mapButtonSprite,null,inputSystem.mapButton, paint)
-        canvas.drawBitmap(inputSystem.moveLeftSprite,null,inputSystem.turnLeftButton, paint)
-        canvas.drawBitmap(inputSystem.moveRightSprite,null,inputSystem.turnRightButton, paint)
+        canvas.drawBitmap(inputSystem.mapButtonSprite,null,inputSystem.mapButton, paint)}
         if(gameState.currentState == StateEnum.MAP){
             if(inputSystem.requestedWeapon == 0)
                 paint.color = Color.argb(1f,1f,1f,1f)
@@ -123,9 +124,25 @@ class Game(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
                 canvas.drawBitmap(inputSystem.launcherButtonSprite,null,inputSystem.launcherButton, paint)
             }
             paint.color = Color.argb(0.25f,1f,1f,1f)
-        }
+            }
+        else if(gameState.currentState == StateEnum.GAME) {
+            paint.color = Color.argb(0.25f,1f,1f,1f)
+            canvas.drawBitmap(inputSystem.healthIcon,null,inputSystem.healthIconHolder,paint)
+            canvas.drawBitmap(inputSystem.armorIcon,null,inputSystem.armorIconHolder,paint)
+            canvas.drawBitmap(inputSystem.ammoIcon,null,inputSystem.ammoIconHolder,paint)
+            canvas.drawBitmap(inputSystem.moveLeftSprite,null,inputSystem.turnLeftButton, paint)
+            canvas.drawBitmap(inputSystem.moveRightSprite,null,inputSystem.turnRightButton, paint)
+            paint.color = Color.WHITE
+            paint.textSize = 60f
+            paint.textAlign = Paint.Align.CENTER
+            canvas.drawText("time: " + gameState.levelTimer.toInt().toString() + "\t score: " + gameState.player.score.toString(),canvas.width/2f,80f,paint)
+            canvas.drawText(gameState.player.hp.toString(),inputSystem.healthIconHolder.centerX(),inputSystem.healthIconHolder.centerY(),paint)
+            canvas.drawText(gameState.player.armor.toString(),inputSystem.armorIconHolder.centerX(),inputSystem.armorIconHolder.centerY(),paint)
+            canvas.drawText(gameState.player.weaponAmmoCurrent[gameState.player.currentWeapon].toString(),inputSystem.ammoIconHolder.centerX(),inputSystem.ammoIconHolder.centerY(),paint)
 
+        }
     }
+
     fun drawDebug(canvas: Canvas) {
         val paint = Paint()
         paint.color = Color.MAGENTA

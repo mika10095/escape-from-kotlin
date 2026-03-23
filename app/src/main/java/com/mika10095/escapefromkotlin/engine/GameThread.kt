@@ -22,6 +22,10 @@ class GameThread(val surfaceHolder: SurfaceHolder, val game: Game) : Thread() {
             val currentTime = System.currentTimeMillis()
             updateMili = (currentTime - lastMili).toInt()
             lastMili = currentTime.toInt()
+            if(updateMili > 1000)
+            {
+                updateMili = 0
+            }
 
             if (currentTime - secondTimer > 1000) {
                 Log.d("Game", "Framerate: $frames")

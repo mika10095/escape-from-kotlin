@@ -22,6 +22,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
     val maxSearchTime = 3f
     val viewDistance = 1024f
     val hearingRange = 256f
+    var damage = 15
     val fov = Math.toRadians(90.0).toFloat()
     enum class State {
         WANDER,
@@ -144,7 +145,10 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
             if (shootCooldown <= 0f) {
                 shooting = true
                 shootCooldown = shootDelay
-                Log.d("game", "Player got hit")
+                val damage = ((1-(Random.nextFloat()-0.5f))*damage).toInt()
+                player.hp=(player.hp-(damage*1-player.armor/100)).coerceIn(0,player.maxhp)
+                player.armor=(player.armor-damage).coerceIn(0,player.maxarmor)
+                Log.d("game", "Player got hit for $damage their current health is ${player.hp} HP ${player.armor} ARMOR")
             } else {
                 shooting = false
             }

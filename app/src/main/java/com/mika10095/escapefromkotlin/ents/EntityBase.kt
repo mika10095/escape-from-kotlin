@@ -7,7 +7,7 @@ import kotlin.math.atan2
 import kotlin.math.hypot
 
 @Suppress("SpellCheckingInspection")
-abstract class EntityBase(var hp: Int = 100, var posx: Float = 0f, var posy: Float = 0f, var turnspeed: Float = 2f, var speed: Float = 100f){
+abstract class EntityBase(open var hp: Int = 100, var posx: Float = 0f, var posy: Float = 0f, var turnspeed: Float = 2f, var speed: Float = 100f){
     val dead get() = hp == 0 && deathTimer < 0
     var deathTimer = 10f
     var radius = 20f

@@ -6,7 +6,7 @@ import androidx.core.content.edit
 class SettingsManager(context: Context) {
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)!!
     var fov: Float
-        get() = prefs.getFloat("raycasterFOV", 60f)
+        get() = prefs.getFloat("raycasterFOV", 90f)
         set(value) = prefs.edit { putFloat("raycasterFOV", value.coerceIn(30f, 120f)) }
     var rayCount: Int
         get() = prefs.getInt("rayCount", 128)

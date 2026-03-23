@@ -222,9 +222,9 @@ class Renderer(context: Context) {
             )
 
             val bmp = when (entity) {
-                is Enemy -> enemyTextures[entity.spriteId]
-                is Prop -> propTextures[entity.spriteId]
-                is PickupItem -> pickupables[entity.spriteId]
+                is Enemy -> enemyTextures[entity.spriteId.coerceIn(0,enemyTextures.count()-1)]
+                is Prop -> propTextures[entity.spriteId.coerceIn(0,propTextures.count()-1)]
+                is PickupItem -> pickupables[entity.spriteId.coerceIn(0,pickupables.count()-1)]
                 else -> continue
             }
             val shade = ((1f - distance / 1024) * 255f).toInt().coerceIn(0, 255)
