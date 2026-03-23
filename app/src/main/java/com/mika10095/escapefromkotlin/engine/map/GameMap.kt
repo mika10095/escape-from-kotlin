@@ -6,9 +6,9 @@ class GameMap(x: Int, y: Int, mapValues: Array<Int>) {
             const val WALL = 1
             const val SECRET_WALL = 2
             const val DOOR = 3
-            const val DOOR_OPEN = -103
+            const val DOOR_OPEN = -13
             const val SECRET_DOOR = 4
-            const val SECRET_DOOR_OPEN = -104
+            const val SECRET_DOOR_OPEN = -14
             const val EXIT = 5
             const val PLAYER = -1
             const val ENEMY_1 = -2

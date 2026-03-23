@@ -2,26 +2,41 @@ package com.mika10095.escapefromkotlin.ents
 
 import com.mika10095.escapefromkotlin.engine.GameState
 
-enum class PickupType {
-    SHOTGUN,
-    ROCKET,
-    AMMOPISTOL,
-    AMMOSHOTGUN,
-    HEALTHS,
-    HEALTHM,
-    HEALTHL,
-    ARMORS,
-    ARMORL,
-    TREASURES,
-    TREASUREM,
-    TREASUREL,
-    TREASUREXL,
-    KEY
-}
-
 class PickupItem : EntityBase() {
-
-    lateinit var type: PickupType
+    enum class PickupType {
+        SHOTGUN,
+        ROCKET,
+        AMMOPISTOL,
+        AMMOSHOTGUN,
+        HEALTHS,
+        HEALTHM,
+        HEALTHL,
+        ARMORS,
+        ARMORL,
+        TREASURES,
+        TREASUREM,
+        TREASUREL,
+        TREASUREXL,
+        KEY
+    }
+    val type: PickupType
+        get() = when (spriteId) {
+            0 -> PickupType.SHOTGUN
+            1 -> PickupType.ROCKET
+            2 -> PickupType.AMMOPISTOL
+            3 -> PickupType.AMMOSHOTGUN
+            4 -> PickupType.HEALTHS
+            5 -> PickupType.HEALTHM
+            6 -> PickupType.HEALTHL
+            7 -> PickupType.ARMORS
+            8 -> PickupType.ARMORL
+            9 -> PickupType.TREASURES
+            10 -> PickupType.TREASUREM
+            11 -> PickupType.TREASUREL
+            12 -> PickupType.TREASUREXL
+            13 -> PickupType.KEY
+            else -> PickupType.AMMOPISTOL
+        }
 
     init {
         pickupable = true
@@ -31,9 +46,12 @@ class PickupItem : EntityBase() {
 
     override fun onPlayerTouch(state: GameState) {
         when (type) {
-            PickupType.SHOTGUN -> state.player.shotgunUnlocked = true
+            PickupType.SHOTGUN -> {
+                state.player.unlockShotgun = true
+                state.player.weaponAmmoCurrent[2] = 5
+            }
             PickupType.ROCKET -> {
-                state.player.shotgunUnlocked = true
+                state.player.unlockPanzerfaust = true
                 state.player.weaponAmmoCurrent[3] = 1
             }
             PickupType.AMMOPISTOL -> state.player.weaponAmmoCurrent[1] += 15

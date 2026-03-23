@@ -86,19 +86,18 @@ class Renderer(context: Context) {
     val pickupables = arrayOf(
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_shotgun),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_panzerfaust),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_key_1),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_key_2),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_pistol),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_shotgun),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_small),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_large),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_small),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_medium),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_large),
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_small),
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_large),
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_pistol),
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_shotgun),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_small),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_medium),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_large),
         BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_huge),
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_key_1),
 
     )
     val weaponTextures = arrayOf(

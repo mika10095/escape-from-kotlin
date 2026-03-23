@@ -12,7 +12,7 @@ abstract class EntityBase(var hp: Int = 100, var posx: Float = 0f, var posy: Flo
     var deathTimer = 10f
     var radius = 20f
     var visible = true
-    var solid = false
+    open var solid = false
     var pickupable = false
     var spriteId = 0
     var rot = 0f
@@ -32,6 +32,7 @@ abstract class EntityBase(var hp: Int = 100, var posx: Float = 0f, var posy: Flo
     open fun update(state: GameState, dt : Double){
         if(hp == 0)
             deathTimer-=dt.toFloat()
+        updateVisibility(state)
     }
     fun setPosition(x: Float,y: Float)
     {

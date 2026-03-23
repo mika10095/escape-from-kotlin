@@ -22,9 +22,11 @@ class Player: EntityBase() {
     var pistolAmmo = 30
     var pistolAmmoMax = 99
     var shotgunUnlocked = false
+    var unlockShotgun = false
     var shotgunAmmo = 0
     var shotgunAmmoMax = 30
     var panzerfaustUnlocked = false
+    var unlockPanzerfaust = false
     var rocketAmmo = 0
     var rocketAmmoMax = 1
 
@@ -52,12 +54,37 @@ class Player: EntityBase() {
         10,
         1
     )
+    var weaponDelay = arrayOf(
+        0.5,
+        0.25,
+        0.5,
+        99.0
+    )
     fun update(state: GameState,inputSystem: InputSystem, dt: Double) {
         super.update(state,dt)
+        if(unlockShotgun)
+        {
+            Log.d("weapon","Player picked up Shotgun")
+            shotgunUnlocked = true
+            inputSystem.requestedWeapon = 2
+            unlockShotgun = false
+        }
+        if(unlockPanzerfaust)
+        {
+            Log.d("weapon","Player picked up Panzerfaust")
+            panzerfaustUnlocked = true
+            inputSystem.requestedWeapon = 3
+            unlockPanzerfaust = false
+        }
         if(inputSystem.requestedWeapon != currentWeapon)
         {
+            if(currentWeapon == 3 && weaponAmmoCurrent[3] == 0)
+            {
+                panzerfaustUnlocked = false
+            }
             Log.d("game","Player switching weapon from: $currentWeapon to ${inputSystem.requestedWeapon}")
             currentWeapon = inputSystem.requestedWeapon
+            startedShooting = 0.0
         }
         if(state.gameMap.tileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot))==state.gameMap.tiles.DOOR && inputSystem.shootInput){
             state.gameMap.setTileAtFromWorld(posx+40*cos(rot),posy+40*sin(rot),state.gameMap.tiles.DOOR_OPEN)
@@ -73,7 +100,7 @@ class Player: EntityBase() {
         }
         else if (inputSystem.shootInput && startedShooting < 0)
         {
-            startedShooting = 0.25
+            startedShooting = weaponDelay[currentWeapon]
             shooting = true
             playerShoot(state,inputSystem)
             inputSystem.shootInput = false

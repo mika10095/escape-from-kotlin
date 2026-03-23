@@ -10,10 +10,11 @@ import kotlin.math.sign
 import kotlin.math.sin
 
 class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBase() {
+    override var solid = true
     var shooting = false
     var shootingStance = false
     var shootCooldown = 0f
-    var state = State.WANDER
+    var stateAI = State.WANDER
     var lastSeenX = 0f
     var lastSeenY = 0f
     var searchTimer = 0f
@@ -29,8 +30,10 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
     override fun update(state: GameState, dt: Double) {
         super.update(state, dt)
         updateVisibility(state)
-        if(hp == 0)
+        if(hp == 0){
+            solid = false
             return
+        }
         val player = state.player
 
         val dx = player.posx - posx
@@ -42,7 +45,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
         if (player.shooting && dist < hearingRange) {
             lastSeenX = player.posx
             lastSeenY = player.posy
-            this@Enemy.state = State.SEARCH
+            stateAI = State.SEARCH
             searchTimer = maxSearchTime
         }
 
@@ -51,18 +54,18 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
         if (visible) {
             lastSeenX = player.posx
             lastSeenY = player.posy
-            this@Enemy.state = State.CHASE
+            stateAI = State.CHASE
             searchTimer = maxSearchTime
         }
 
-        if (this@Enemy.state == State.SEARCH) {
+        if (stateAI == State.SEARCH) {
             searchTimer -= dt.toFloat()
             if (searchTimer <= 0f) {
-                this@Enemy.state = State.WANDER
+                stateAI = State.WANDER
             }
         }
 
-        when (this@Enemy.state) {
+        when (stateAI) {
             State.WANDER -> wander(state, dt)
             State.CHASE -> chase(state, dt)
             State.SEARCH -> search(state, dt)

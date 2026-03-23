@@ -7,7 +7,9 @@ import com.mika10095.escapefromkotlin.engine.map.GameMap
 import com.mika10095.escapefromkotlin.engine.map.Renderer
 import com.mika10095.escapefromkotlin.ents.Enemy
 import com.mika10095.escapefromkotlin.ents.EntityBase
+import com.mika10095.escapefromkotlin.ents.PickupItem
 import com.mika10095.escapefromkotlin.ents.Player
+import com.mika10095.escapefromkotlin.ents.Prop
 import com.mika10095.escapefromkotlin.input.InputSystem
 import java.lang.Math.PI
 import kotlin.math.abs
@@ -79,8 +81,9 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     fun mapInit(){
         for (y in 0 until gameMap.height) {
             for (x in 0 until gameMap.width) {
-                when (gameMap.tileAt(x, y)) {
-                    gameMap.tiles.ENEMY_1 -> {
+                val tile = gameMap.tileAt(x, y)
+                when{
+                    tile == gameMap.tiles.ENEMY_1 -> {
                         val enemy = Enemy()
                         enemy.setPosition(
                             x * gameMap.tileSize + gameMap.tileSize/2,
@@ -89,7 +92,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                         enemy.rot = (Random.nextFloat()-0.5f)*2*PI.toFloat()
                         entities.add(enemy)
                     }
-                    gameMap.tiles.PLAYER -> {
+                    tile == gameMap.tiles.PLAYER -> {
                         player = Player()
                         player.radius = 20f
                         player.setPosition(
@@ -97,11 +100,35 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                             y * gameMap.tileSize + gameMap.tileSize/2
                         )
                     }
-                    gameMap.tiles.DOOR_OPEN -> {
+                    tile == gameMap.tiles.DOOR_OPEN -> {
                         gameMap.setTileAt(x,y, gameMap.tiles.DOOR)
                     }
-                    gameMap.tiles.SECRET_DOOR_OPEN -> {
+                    tile == gameMap.tiles.SECRET_DOOR_OPEN -> {
                         gameMap.setTileAt(x,y, gameMap.tiles.SECRET_DOOR)
+                    }
+                    tile in -199..-100 -> {
+                        val prop = Prop()
+                        prop.setPosition(
+                            x * gameMap.tileSize + gameMap.tileSize/2,
+                            y * gameMap.tileSize + gameMap.tileSize/2
+                        )
+                        val propId = abs(tile + 100)
+                        prop.spriteId = propId
+                        prop.solid = propId >= 13
+                        entities.add(prop)
+                    }
+                    tile in -299..-200 -> {
+                        val pickup = PickupItem()
+                        pickup.setPosition(
+                            x * gameMap.tileSize + gameMap.tileSize/2,
+                            y * gameMap.tileSize + gameMap.tileSize/2
+                        )
+
+                        val pickupId = abs(tile + 200)
+                        pickup.spriteId = pickupId
+
+
+                        entities.add(pickup)
                     }
                 }
             }
@@ -179,12 +206,12 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
             if(settingsManager.debug) {
                 drawMap(canvas)
                 drawPlayer(canvas)
-                drawEnemies(canvas)
+                drawEntities(canvas)
             }
         }
         if (currentState == StateEnum.MAP) {
             drawPlayer(canvas)
-            drawEnemies(canvas)
+            drawEntities(canvas)
             drawMap(canvas)
         }
 
@@ -256,23 +283,15 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
         )
     }
 
-    fun drawEnemies(canvas: Canvas) {
-        for (enemy in entities) {
+    fun drawEntities(canvas: Canvas) {
+        for (entity in entities) {
+            if(!entity.visible)
+                continue
             val paint = Paint()
-            paint.color = if (enemy.visible) Color.GREEN else Color.RED
+            paint.color = if (entity.hp == 0) Color.GRAY
+            else  Color.RED
+            canvas.drawCircle(entity.posx + offsetX, entity.posy + offsetY, entity.radius, paint)
 
-            canvas.drawCircle(enemy.posx + offsetX, enemy.posy + offsetY, enemy.radius, paint)
-
-            paint.color = if (enemy.spriteId == 5) Color.RED else Color.GREEN
-            paint.strokeWidth = 5f
-
-            canvas.drawLine(
-                enemy.posx + offsetX,
-                enemy.posy + offsetY,
-                enemy.posx + offsetX + 40 * cos(enemy.rot),
-                enemy.posy + offsetY + 40 * sin(enemy.rot),
-                paint
-            )
         }
     }
 
