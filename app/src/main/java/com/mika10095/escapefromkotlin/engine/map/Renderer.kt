@@ -8,10 +8,7 @@ import android.graphics.LightingColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
-import android.util.Log
-import androidx.annotation.ColorInt
 import androidx.core.graphics.createBitmap
-import androidx.core.graphics.scale
 import com.mika10095.escapefromkotlin.R
 import com.mika10095.escapefromkotlin.engine.GameState
 import com.mika10095.escapefromkotlin.engine.raycast.RayCaster
@@ -197,7 +194,7 @@ class Renderer(context: Context) {
         }
 
         for (entity in sorted) {
-            if(!entity.visible) continue
+            if (!entity.visible) continue
 
             val dx = entity.posx - player.posx
             val dy = entity.posy - player.posy
@@ -223,9 +220,9 @@ class Renderer(context: Context) {
             )
 
             val bmp = when (entity) {
-                is Enemy -> enemyTextures[entity.spriteId.coerceIn(0,enemyTextures.count()-1)]
-                is Prop -> propTextures[entity.spriteId.coerceIn(0,propTextures.count()-1)]
-                is PickupItem -> pickupables[entity.spriteId.coerceIn(0,pickupables.count()-1)]
+                is Enemy -> enemyTextures[entity.spriteId.coerceIn(0, enemyTextures.count() - 1)]
+                is Prop -> propTextures[entity.spriteId.coerceIn(0, propTextures.count() - 1)]
+                is PickupItem -> pickupables[entity.spriteId.coerceIn(0, pickupables.count() - 1)]
                 else -> continue
             }
             val shade = ((1f - distance / 1024) * 255f).toInt().coerceIn(0, 255)
@@ -305,9 +302,9 @@ class Renderer(context: Context) {
         val bottom = canvas.height.toFloat()
 
 
-        var spriteId = 2*state.player.currentWeapon
+        var spriteId = 2 * state.player.currentWeapon
         if (state.player.shooting)
             spriteId++
-        canvas.drawBitmap(weaponTextures[spriteId],  null,RectF(left, top, right, bottom), null)
+        canvas.drawBitmap(weaponTextures[spriteId], null, RectF(left, top, right, bottom), null)
     }
 }

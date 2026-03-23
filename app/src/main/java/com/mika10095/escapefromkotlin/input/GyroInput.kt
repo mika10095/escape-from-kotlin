@@ -23,9 +23,11 @@ class GyroInput(context: Context) : SensorEventListener {
             )
         }
     }
+
     fun stop() {
         sensorManager.unregisterListener(this)
     }
+
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
     }
 

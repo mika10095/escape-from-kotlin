@@ -14,18 +14,21 @@ class SettingsManager(context: Context) {
     var buttonAimSens: Float
         get() = prefs.getInt("buttonAimSens", 10).toFloat() / 10f
         set(value) = prefs.edit {
-            putInt("buttonAimSens", (value.coerceIn(-4f, 4f) * 10).toInt()) }
+            putInt("buttonAimSens", (value.coerceIn(-4f, 4f) * 10).toInt())
+        }
     var gyroAimSens: Float
         get() = prefs.getInt("gyroAimSens", 10).toFloat() / 10f
         set(value) = prefs.edit {
-            putInt("gyroAimSens", (value.coerceIn(-4f, 4f) * 10).toInt()) }
+            putInt("gyroAimSens", (value.coerceIn(-4f, 4f) * 10).toInt())
+        }
     var tiltAimSens: Float
         get() = prefs.getInt("tiltAimSens", 10).toFloat() / 10f
         set(value) = prefs.edit {
-            putInt("tiltAimSens", (value.coerceIn(-4f, 4f) * 10).toInt()) }
+            putInt("tiltAimSens", (value.coerceIn(-4f, 4f) * 10).toInt())
+        }
     var debug: Boolean
         get() = prefs.getBoolean("debug", false)
-        set(value) = prefs.edit { putBoolean("debug",value) }
+        set(value) = prefs.edit { putBoolean("debug", value) }
     var useButtonAim: Boolean
         get() = prefs.getBoolean("useButtonAim", true)
         set(value) = prefs.edit { putBoolean("useButtonAim", value) }
@@ -41,7 +44,8 @@ class SettingsManager(context: Context) {
     var useButtonMap: Boolean
         get() = prefs.getBoolean("useButtonMap", true)
         set(value) = prefs.edit { putBoolean("useButtonMap", value) }
-    fun clearPrefs(){
+
+    fun clearPrefs() {
         prefs.edit { clear() }
     }
 }

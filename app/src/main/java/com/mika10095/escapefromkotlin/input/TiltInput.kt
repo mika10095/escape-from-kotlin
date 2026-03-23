@@ -25,9 +25,11 @@ class TiltInput(context: Context) : SensorEventListener {
             )
         }
     }
+
     fun stop() {
         sensorManager.unregisterListener(this)
     }
+
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
     }
 
@@ -35,7 +37,7 @@ class TiltInput(context: Context) : SensorEventListener {
 
         val tiltY = event!!.values[1]
         val tiltX = event.values[0]
-        turn = if(abs(tiltY) > 0.4)
+        turn = if (abs(tiltY) > 0.4)
             (tiltY / 5f).coerceIn(-1f, 1f)
         else
             0f

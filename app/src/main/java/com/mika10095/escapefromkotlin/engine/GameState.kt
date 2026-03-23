@@ -79,50 +79,55 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     var levelStarted = false
     var offsetX = 0f
     var offsetY = 0f
-    fun mapInit(){
+    fun mapInit() {
         for (y in 0 until gameMap.height) {
             for (x in 0 until gameMap.width) {
                 val tile = gameMap.tileAt(x, y)
-                when{
+                when {
                     tile == gameMap.tiles.ENEMY_1 -> {
                         val enemy = Enemy()
                         enemy.setPosition(
-                            x * gameMap.tileSize + gameMap.tileSize/2,
-                            y * gameMap.tileSize + gameMap.tileSize/2
+                            x * gameMap.tileSize + gameMap.tileSize / 2,
+                            y * gameMap.tileSize + gameMap.tileSize / 2
                         )
-                        enemy.rot = (Random.nextFloat()-0.5f)*2*PI.toFloat()
+                        enemy.rot = (Random.nextFloat() - 0.5f) * 2 * PI.toFloat()
                         entities.add(enemy)
                     }
+
                     tile == gameMap.tiles.PLAYER -> {
                         player = Player()
                         player.radius = 20f
                         player.setPosition(
-                            x * gameMap.tileSize + gameMap.tileSize/2,
-                            y * gameMap.tileSize + gameMap.tileSize/2
+                            x * gameMap.tileSize + gameMap.tileSize / 2,
+                            y * gameMap.tileSize + gameMap.tileSize / 2
                         )
                     }
+
                     tile == gameMap.tiles.DOOR_OPEN -> {
-                        gameMap.setTileAt(x,y, gameMap.tiles.DOOR)
+                        gameMap.setTileAt(x, y, gameMap.tiles.DOOR)
                     }
+
                     tile == gameMap.tiles.SECRET_DOOR_OPEN -> {
-                        gameMap.setTileAt(x,y, gameMap.tiles.SECRET_DOOR)
+                        gameMap.setTileAt(x, y, gameMap.tiles.SECRET_DOOR)
                     }
+
                     tile in -199..-100 -> {
                         val prop = Prop()
                         prop.setPosition(
-                            x * gameMap.tileSize + gameMap.tileSize/2,
-                            y * gameMap.tileSize + gameMap.tileSize/2
+                            x * gameMap.tileSize + gameMap.tileSize / 2,
+                            y * gameMap.tileSize + gameMap.tileSize / 2
                         )
                         val propId = abs(tile + 100)
                         prop.spriteId = propId
                         prop.solid = propId >= 13
                         entities.add(prop)
                     }
+
                     tile in -299..-200 -> {
                         val pickup = PickupItem()
                         pickup.setPosition(
-                            x * gameMap.tileSize + gameMap.tileSize/2,
-                            y * gameMap.tileSize + gameMap.tileSize/2
+                            x * gameMap.tileSize + gameMap.tileSize / 2,
+                            y * gameMap.tileSize + gameMap.tileSize / 2
                         )
 
                         val pickupId = abs(tile + 200)
@@ -135,12 +140,14 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
             }
         }
     }
-    fun resetLevel(){
+
+    fun resetLevel() {
         entities.clear()
         levelTimer = 0.0
         levelStarted = false
         mapInit()
     }
+
     fun tryMoveEntity(entity: EntityBase, dx: Float, dy: Float): Boolean {
         var movedFully = false
 
@@ -157,10 +164,12 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                 entity.posy = ny
                 movedFully = true
             }
+
             canX -> {
                 entity.posx = nx
                 movedFully = false
             }
+
             canY -> {
                 entity.posy = ny
                 movedFully = false
@@ -169,6 +178,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
         return movedFully
     }
+
     fun isBlockedCircle(x: Float, y: Float, radius: Float, ignore: EntityBase? = null): Boolean {
         if (gameMap.isWallCircle(x, y, radius)) return true
 
@@ -185,6 +195,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
         return false
     }
+
     fun drawState(canvas: Canvas) {
         if (currentState == StateEnum.MENU) {
             drawMenu(canvas)
@@ -205,7 +216,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
             renderer.draw(this, canvas)
             renderer.drawEntities(this, canvas)
             renderer.drawWeapon(this, canvas)
-            if(settingsManager.debug) {
+            if (settingsManager.debug) {
                 drawMap(canvas)
                 drawPlayer(canvas)
                 drawEntities(canvas)
@@ -231,9 +242,10 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
         val menuItems = when (currentMenu) {
             MenuType.MAIN -> if (levelStarted)
-                    startedMenuItems
-                else
-                    mainMenuItems
+                startedMenuItems
+            else
+                mainMenuItems
+
             MenuType.SETTINGS -> settingsMenuItems
         }
 
@@ -268,12 +280,12 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     }
 
     fun drawPlayer(canvas: Canvas) {
-        offsetX = canvas.width/2 - player.posx
-        offsetY = canvas.height/2 - player.posy
+        offsetX = canvas.width / 2 - player.posx
+        offsetY = canvas.height / 2 - player.posy
 
         val paint = Paint()
         paint.color = Color.WHITE
-        canvas.drawCircle(player.posx+offsetX, player.posy+offsetY, player.radius, paint)
+        canvas.drawCircle(player.posx + offsetX, player.posy + offsetY, player.radius, paint)
         paint.color = Color.GREEN
         paint.strokeWidth = 5f
         canvas.drawLine(
@@ -287,13 +299,13 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
     fun drawEntities(canvas: Canvas) {
         for (entity in entities) {
-            if(!entity.visible && !settingsManager.debug)
+            if (!entity.visible && !settingsManager.debug)
                 continue
             val paint = Paint()
             paint.color = if (entity.hp == 0) Color.GRAY
-            else  Color.RED
+            else Color.RED
             canvas.drawCircle(entity.posx + offsetX, entity.posy + offsetY, entity.radius, paint)
-            if(settingsManager.debug) {
+            if (settingsManager.debug) {
                 paint.color = Color.GREEN
                 paint.strokeWidth = 5f
                 canvas.drawLine(
@@ -312,9 +324,9 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
         paint.color = Color.RED
         for (y in 0..<gameMap.height) {
             for (x in 0..<gameMap.width) {
-                val index = y * gameMap.width + x
-                if (gameMap.isWall(x,y) && gameMap.tileAt(x,y) != gameMap.tiles.SECRET_WALL) {
-                    when(gameMap.tileAt(x,y)){
+                y * gameMap.width + x
+                if (gameMap.isWall(x, y) && gameMap.tileAt(x, y) != gameMap.tiles.SECRET_WALL) {
+                    when (gameMap.tileAt(x, y)) {
                         gameMap.tiles.WALL -> paint.color = Color.WHITE
                         gameMap.tiles.SECRET_DOOR -> paint.color = Color.WHITE
                         gameMap.tiles.DOOR -> paint.color = Color.RED
@@ -333,12 +345,13 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     }
 
     fun updateMenu(dt: Double, inputSystem: InputSystem) {
-        if ( menuSwitchCooldown > 0 ) return
+        if (menuSwitchCooldown > 0) return
         val menuItems = when (currentMenu) {
             MenuType.MAIN -> if (levelStarted)
                 startedMenuItems
             else
                 mainMenuItems
+
             MenuType.SETTINGS -> settingsMenuItems
         }
         if (currentState == StateEnum.MENU) {
@@ -385,8 +398,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                 }
                 menuSwitchCooldown = 0.25
                 inputSystem.clearInputs()
-            }
-            else if(inputSystem.shootInput && currentMenu == MenuType.MAIN){
+            } else if (inputSystem.shootInput && currentMenu == MenuType.MAIN) {
                 when (selectedMenuItem) {
 
                     0 -> {
@@ -411,7 +423,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
             if (inputSystem.shootInput && currentMenu == MenuType.SETTINGS) {
                 changingMenuItem = !changingMenuItem
                 menuSwitchCooldown = 0.1
-                if(selectedMenuItem == 6){
+                if (selectedMenuItem == 6) {
                     currentMenu = MenuType.MAIN
                     selectedMenuItem = 0
                     changingMenuItem = false
@@ -423,13 +435,13 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
                     0 -> settingsManager.fov += 1f * inputSystem.movementInput
                     1 -> settingsManager.rayCount += 16 * inputSystem.movementInput.toInt()
-                    2 -> settingsManager.buttonAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
-                    3 -> settingsManager.gyroAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
-                    4 -> settingsManager.tiltAimSens += ((0.1f * inputSystem.movementInput)* 10f) / 10f
+                    2 -> settingsManager.buttonAimSens += ((0.1f * inputSystem.movementInput) * 10f) / 10f
+                    3 -> settingsManager.gyroAimSens += ((0.1f * inputSystem.movementInput) * 10f) / 10f
+                    4 -> settingsManager.tiltAimSens += ((0.1f * inputSystem.movementInput) * 10f) / 10f
                     5 -> settingsManager.debug = inputSystem.movementInput > 0
-                    else ->{
-                            currentMenu = MenuType.MAIN
-                            selectedMenuItem = 0
+                    else -> {
+                        currentMenu = MenuType.MAIN
+                        selectedMenuItem = 0
                     }
                 }
                 menuSwitchCooldown = 0.1
@@ -440,12 +452,11 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     }
 
     fun updateState(dt: Double, inputSystem: InputSystem) {
-        if(levelTimer == 0.0){
+        if (levelTimer == 0.0) {
             inputSystem.resetWeapon()
             inputSystem.clearInputs()
         }
-        if(player.hp < 0)
-        {
+        if (player.hp < 0) {
             player.hp = 0
             resetLevel()
             currentState = StateEnum.MENU

@@ -22,8 +22,7 @@ class GameThread(val surfaceHolder: SurfaceHolder, val game: Game) : Thread() {
             val currentTime = System.currentTimeMillis()
             updateMili = (currentTime - lastMili).toInt()
             lastMili = currentTime.toInt()
-            if(updateMili > 1000)
-            {
+            if (updateMili > 1000) {
                 updateMili = 0
             }
 

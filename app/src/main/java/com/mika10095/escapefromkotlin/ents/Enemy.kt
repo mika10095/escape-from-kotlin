@@ -11,7 +11,7 @@ import kotlin.math.sign
 import kotlin.math.sin
 import kotlin.random.Random
 
-class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBase() {
+class Enemy(val attackRange: Float = 512f, val shootDelay: Float = 3f) : EntityBase() {
     override var solid = true
     var shooting = false
     var shootingStance = false
@@ -28,6 +28,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
     var wallBumpCooldown = 0.5f
     var wanderdirection = 0f
     val fov = Math.toRadians(90.0).toFloat()
+
     enum class State {
         WANDER,
         CHASE,
@@ -42,7 +43,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
             posy
         )
 
-        val pickupId = Random.nextInt(2,10)
+        val pickupId = Random.nextInt(2, 10)
         pickup.spriteId = pickupId
 
 
@@ -52,7 +53,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
     override fun update(state: GameState, dt: Double) {
         super.update(state, dt)
         updateVisibility(state)
-        if(hp == 0){
+        if (hp == 0) {
             solid = false
             return
         }
@@ -96,20 +97,19 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
     }
 
     fun wander(gameState: GameState, dt: Double) {
-        if(wandertimer < 0) {
+        if (wandertimer < 0) {
             wanderdirection = Random.nextDouble(-PI, PI).toFloat()
-            wandertimer = Random.nextDouble(3.0,10.0).toFloat()
-            Log.d("pathing","Enemy changing course! $wanderdirection for $wandertimer seconds ")
+            wandertimer = Random.nextDouble(3.0, 10.0).toFloat()
+            Log.d("pathing", "Enemy changing course! $wanderdirection for $wandertimer seconds ")
         }
-        rotateTowards(wanderdirection,dt)
+        rotateTowards(wanderdirection, dt)
         val moveSpeed = speed * 0.25f
 
         val moveX = cos(rot) * moveSpeed * dt.toFloat()
         val moveY = sin(rot) * moveSpeed * dt.toFloat()
-        val movedFully = gameState.tryMoveEntity(this,moveX,moveY)
-        if (!movedFully && wallBumpCooldown < 0)
-        {
-            Log.d("pathing","Enemy couldnt move fully!")
+        val movedFully = gameState.tryMoveEntity(this, moveX, moveY)
+        if (!movedFully && wallBumpCooldown < 0) {
+            Log.d("pathing", "Enemy couldnt move fully!")
             wandertimer = -1f
             wallBumpCooldown = 0.5f
         }
@@ -140,19 +140,23 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
         if (dist > attackRange || !visible) {
             val moveX = cos(rot) * speed * moveFactor * dt.toFloat()
             val moveY = sin(rot) * speed * moveFactor * dt.toFloat()
-            gameState.tryMoveEntity(this,moveX,moveY)
+            gameState.tryMoveEntity(this, moveX, moveY)
         }
         Log.d("game", "Enemy angle: " + abs(Math.toDegrees(diff.toDouble())))
         // shooting
-        if (dist < attackRange && abs(Math.toDegrees(diff.toDouble()))<5f && visible) {
+        if (dist < attackRange && abs(Math.toDegrees(diff.toDouble())) < 5f && visible) {
             shootingStance = true
             if (shootCooldown <= 0f) {
                 shooting = true
                 shootCooldown = shootDelay
-                val damage = ((1-(Random.nextFloat()-0.5f))*damage).toInt()
-                player.hp=(player.hp-(damage*1-player.armor/100)).coerceIn(0,player.maxhp)
-                player.armor=(player.armor-damage).coerceIn(0,player.maxarmor)
-                Log.d("game", "Player got hit for $damage their current health is ${player.hp} HP ${player.armor} ARMOR")
+                val damage = ((1 - (Random.nextFloat() - 0.5f)) * damage).toInt()
+                player.hp =
+                    (player.hp - (damage * 1 - player.armor / 100)).coerceIn(0, player.maxhp)
+                player.armor = (player.armor - damage).coerceIn(0, player.maxarmor)
+                Log.d(
+                    "game",
+                    "Player got hit for $damage their current health is ${player.hp} HP ${player.armor} ARMOR"
+                )
             } else {
                 shooting = false
             }
@@ -162,6 +166,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
             shootCooldown = shootDelay
         }
     }
+
     fun search(gameState: GameState, dt: Double) {
         val dx = lastSeenX - posx
         val dy = lastSeenY - posy
@@ -173,7 +178,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
         val targetAngle = atan2(dy, dx)
         rotateTowards(targetAngle, dt)
 
-        val diff = angleDiff(targetAngle,rot)
+        val diff = angleDiff(targetAngle, rot)
 
         if (abs(diff) < 0.5f) {
             val moveX = cos(rot) * speed * dt.toFloat()
@@ -187,6 +192,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
             }
         }
     }
+
     fun rotateTowards(target: Float, dt: Double) {
         var diff = target - rot
 
@@ -197,6 +203,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
             rot += sign(x = diff) * turnspeed * dt.toFloat()
         }
     }
+
     override fun updateVisibility(gameState: GameState) {
         val dx = gameState.player.posx - posx
         val dy = gameState.player.posy - posy
