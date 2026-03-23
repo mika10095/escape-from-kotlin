@@ -11,7 +11,11 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 class Player: EntityBase() {
+    var score = 0
+    var maxhp = 100
+    var maxarmor = 100
     var armor = 0
+    var keyCount = 0
     var shooting = false
     var startedShooting = 0.0
     var currentWeapon = 0
@@ -49,7 +53,7 @@ class Player: EntityBase() {
         1
     )
     fun update(state: GameState,inputSystem: InputSystem, dt: Double) {
-        super.update(dt)
+        super.update(state,dt)
         if(inputSystem.requestedWeapon != currentWeapon)
         {
             Log.d("game","Player switching weapon from: $currentWeapon to ${inputSystem.requestedWeapon}")
@@ -82,12 +86,7 @@ class Player: EntityBase() {
         }
         val moveX = cos(rot) * inputSystem.movementInput * dt.toFloat() * speed
         val moveY = sin(rot) * inputSystem.movementInput * dt.toFloat() * speed
-        if (!state.gameMap.isWallCircle(posx + moveX, posy, radius)) {
-            posx += moveX
-        }
-        if (!state.gameMap.isWallCircle(posx, posy + moveY, radius)) {
-            posy += moveY
-        }
+        state.tryMoveEntity(this, moveX, moveY)
         rot += inputSystem.turnInputGravity * dt.toFloat() * state.settingsManager.tiltAimSens
         rot -= inputSystem.turnInputGyro * dt.toFloat() *  state.settingsManager.gyroAimSens
         rot += inputSystem.turnInput * dt.toFloat() *  state.settingsManager.buttonAimSens
@@ -109,10 +108,14 @@ class Player: EntityBase() {
             state.gameMap
         )
 
-        var closestEnemy: Enemy? = null
+        var closestEnemy: EntityBase? = null
         var closestDist = Float.MAX_VALUE
 
-        for (enemy in state.enemies) {
+        for (enemy in state.entities) {
+            if(enemy !is Enemy)
+            {
+                continue
+            }
             val dx = enemy.posx - px
             val dy = enemy.posy - py
 

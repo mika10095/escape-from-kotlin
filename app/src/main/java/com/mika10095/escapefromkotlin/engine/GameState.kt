@@ -6,6 +6,7 @@ import android.graphics.Paint
 import com.mika10095.escapefromkotlin.engine.map.GameMap
 import com.mika10095.escapefromkotlin.engine.map.Renderer
 import com.mika10095.escapefromkotlin.ents.Enemy
+import com.mika10095.escapefromkotlin.ents.EntityBase
 import com.mika10095.escapefromkotlin.ents.Player
 import com.mika10095.escapefromkotlin.input.InputSystem
 import java.lang.Math.PI
@@ -18,7 +19,7 @@ import kotlin.random.Random
 class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
     var player = Player()
-    val enemies = mutableListOf<Enemy>()
+    val entities = mutableListOf<EntityBase>()
     val gameMap = GameMap(
         8, 8, arrayOf(
             1, 1, 1, 1, 1, 1, 1, 1,
@@ -86,7 +87,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                             y * gameMap.tileSize + gameMap.tileSize/2
                         )
                         enemy.rot = (Random.nextFloat()-0.5f)*2*PI.toFloat()
-                        enemies.add(enemy)
+                        entities.add(enemy)
                     }
                     gameMap.tiles.PLAYER -> {
                         player = Player()
@@ -107,9 +108,53 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
         }
     }
     fun resetLevel(){
-        enemies.clear()
+        entities.clear()
         levelTimer = 0.0
         mapInit()
+    }
+    fun tryMoveEntity(entity: EntityBase, dx: Float, dy: Float): Boolean {
+        var moved = false
+
+        val nx = entity.posx + dx
+        val ny = entity.posy + dy
+
+        val canX = !isBlockedCircle(nx, entity.posy, entity.radius, entity)
+        val canY = !isBlockedCircle(entity.posx, ny, entity.radius, entity)
+        val canBoth = !isBlockedCircle(nx, ny, entity.radius, entity)
+
+        when {
+            canBoth -> {
+                entity.posx = nx
+                entity.posy = ny
+                moved = true
+            }
+            canX -> {
+                entity.posx = nx
+                moved = true
+            }
+            canY -> {
+                entity.posy = ny
+                moved = true
+            }
+        }
+
+        return moved
+    }
+    fun isBlockedCircle(x: Float, y: Float, radius: Float, ignore: EntityBase? = null): Boolean {
+        if (gameMap.isWallCircle(x, y, radius)) return true
+
+        for (e in entities) {
+            if (e === ignore) continue
+            if (!e.solid || e.dead) continue
+
+            val dx = e.posx - x
+            val dy = e.posy - y
+            val rr = e.radius + radius
+
+            if (dx * dx + dy * dy < rr * rr) return true
+        }
+
+        return false
     }
     fun drawState(canvas: Canvas) {
         if (currentState == StateEnum.MENU) {
@@ -129,7 +174,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                 paint
             )
             renderer.draw(this, canvas)
-            renderer.drawEnemies(this, canvas)
+            renderer.drawEntities(this, canvas)
             renderer.drawWeapon(this, canvas)
             if(settingsManager.debug) {
                 drawMap(canvas)
@@ -212,13 +257,13 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     }
 
     fun drawEnemies(canvas: Canvas) {
-        for (enemy in enemies) {
+        for (enemy in entities) {
             val paint = Paint()
             paint.color = if (enemy.visible) Color.GREEN else Color.RED
 
             canvas.drawCircle(enemy.posx + offsetX, enemy.posy + offsetY, enemy.radius, paint)
 
-            paint.color = if (enemy.shooting) Color.RED else Color.GREEN
+            paint.color = if (enemy.spriteId == 5) Color.RED else Color.GREEN
             paint.strokeWidth = 5f
 
             canvas.drawLine(
@@ -383,10 +428,23 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
         }
         if (currentState == StateEnum.GAME) {
             player.update(this, inputSystem, dt)
-            for (enemy in enemies) {
-                enemy.update(this, dt)
+            for (entity in entities) {
+                entity.update(this, dt)
             }
-            enemies.removeAll { it.dead }
+            for (entity in entities) {
+                if (entity.pickupable) {
+                    val dx = entity.posx - player.posx
+                    val dy = entity.posy - player.posy
+                    val dist = hypot(dx.toDouble(), dy.toDouble())
+
+                    if (dist < entity.radius + player.radius) {
+                        entity.onPlayerTouch(this)
+                    }
+                }
+            }
+            entities.removeAll { it.dead }
+
+
         }
         if (currentState == StateEnum.MAP) {
 

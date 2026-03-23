@@ -9,9 +9,7 @@ import kotlin.math.hypot
 import kotlin.math.sign
 import kotlin.math.sin
 
-class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBase() {
-
-    var visible = false
+class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBase() {
     var shooting = false
     var shootingStance = false
     var shootCooldown = 0f
@@ -28,12 +26,12 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: 
         CHASE,
         SEARCH
     }
-    fun update(gameState: GameState, dt: Double) {
-        super.update(dt)
-        updateVisibility(gameState)
+    override fun update(state: GameState, dt: Double) {
+        super.update(state, dt)
+        updateVisibility(state)
         if(hp == 0)
             return
-        val player = gameState.player
+        val player = state.player
 
         val dx = player.posx - posx
         val dy = player.posy - posy
@@ -44,7 +42,7 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: 
         if (player.shooting && dist < hearingRange) {
             lastSeenX = player.posx
             lastSeenY = player.posy
-            state = State.SEARCH
+            this@Enemy.state = State.SEARCH
             searchTimer = maxSearchTime
         }
 
@@ -53,21 +51,21 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: 
         if (visible) {
             lastSeenX = player.posx
             lastSeenY = player.posy
-            state = State.CHASE
+            this@Enemy.state = State.CHASE
             searchTimer = maxSearchTime
         }
 
-        if (state == State.SEARCH) {
+        if (this@Enemy.state == State.SEARCH) {
             searchTimer -= dt.toFloat()
             if (searchTimer <= 0f) {
-                state = State.WANDER
+                this@Enemy.state = State.WANDER
             }
         }
 
-        when (state) {
-            State.WANDER -> wander(gameState, dt)
-            State.CHASE -> chase(gameState, dt)
-            State.SEARCH -> search(gameState, dt)
+        when (this@Enemy.state) {
+            State.WANDER -> wander(state, dt)
+            State.CHASE -> chase(state, dt)
+            State.SEARCH -> search(state, dt)
         }
     }
 
@@ -147,7 +145,7 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: 
         val targetAngle = atan2(dy, dx)
         rotateTowards(targetAngle, dt)
 
-        var diff = angleDiff(targetAngle,rot)
+        val diff = angleDiff(targetAngle,rot)
 
         if (abs(diff) < 0.5f) {
             val moveX = cos(rot) * speed * dt.toFloat()
@@ -171,7 +169,7 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: 
             rot += sign(x = diff) * turnspeed * dt.toFloat()
         }
     }
-    fun updateVisibility(gameState: GameState) {
+    override fun updateVisibility(gameState: GameState) {
         val dx = gameState.player.posx - posx
         val dy = gameState.player.posy - posy
 
@@ -183,10 +181,20 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: 
 
         val angleToPlayer = atan2(dy, dx)
 
+
         var diff = angleToPlayer - rot
         while (diff > Math.PI) diff -= (2 * Math.PI).toFloat()
         while (diff < -Math.PI) diff += (2 * Math.PI).toFloat()
-
+        val spriteAngle = Math.toDegrees(diff.toDouble()).toFloat()
+        spriteId = when {
+            hp == 0 -> 6
+            shooting -> 5
+            shootingStance -> 4
+            spriteAngle > -45 && spriteAngle <= 45 -> 0     // back
+            spriteAngle > 45 && spriteAngle <= 135 -> 1     // left
+            spriteAngle <= -45 && spriteAngle > -135 -> 3   // right
+            else -> 2                      // front
+        }
         if (abs(diff) > fov / 2f) {
             lastSeenX = gameState.player.posx
             lastSeenY = gameState.player.posy

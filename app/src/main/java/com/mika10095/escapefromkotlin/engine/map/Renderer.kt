@@ -15,6 +15,9 @@ import androidx.core.graphics.scale
 import com.mika10095.escapefromkotlin.R
 import com.mika10095.escapefromkotlin.engine.GameState
 import com.mika10095.escapefromkotlin.engine.raycast.RayCaster
+import com.mika10095.escapefromkotlin.ents.Enemy
+import com.mika10095.escapefromkotlin.ents.PickupItem
+import com.mika10095.escapefromkotlin.ents.Prop
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -184,7 +187,55 @@ class Renderer(context: Context) {
         canvas.drawBitmap(columnBitmap, null, dst, null)
     }
 
-    fun drawEnemies(state: GameState, canvas: Canvas) {
+    fun drawEntities(state: GameState, canvas: Canvas) {
+        val player = state.player
+
+        val sorted = state.entities.sortedByDescending {
+            val dx = it.posx - player.posx
+            val dy = it.posy - player.posy
+            dx * dx + dy * dy
+        }
+
+        for (entity in sorted) {
+            if(!entity.visible) continue
+
+            val dx = entity.posx - player.posx
+            val dy = entity.posy - player.posy
+
+            val distance = sqrt(dx * dx + dy * dy)
+
+            val angleTo = atan2(dy, dx)
+            val angleDiff = entity.angleDiff(angleTo, player.rot)
+
+            val fov = Math.toRadians(state.settingsManager.fov.toDouble()).toFloat()
+
+            if (abs(angleDiff) > fov / 2) continue
+
+            val screenX = (0.5f + angleDiff / fov) * canvas.width
+
+            val size = (canvas.height * 64f) / distance
+
+            val dst = RectF(
+                screenX - size / 2,
+                canvas.height / 2 - size / 2,
+                screenX + size / 2,
+                canvas.height / 2 + size / 2
+            )
+
+            val bmp = when (entity) {
+                is Enemy -> enemyTextures[entity.spriteId]
+                is Prop -> propTextures[entity.spriteId]
+                is PickupItem -> pickupables[entity.spriteId]
+                else -> continue
+            }
+            val shade = ((1f - distance / 1024) * 255f).toInt().coerceIn(0, 255)
+            val paint = Paint()
+            paint.colorFilter = LightingColorFilter(Color.rgb(shade, shade, shade), 0)
+            paint.isFilterBitmap = false
+            canvas.drawBitmap(bmp, null, dst, paint)
+        }
+    }
+    /*fun drawEnemies(state: GameState, canvas: Canvas) {
 
         val player = state.player
         val enemies = state.enemies
@@ -242,7 +293,7 @@ class Renderer(context: Context) {
             paint.isFilterBitmap = false
             canvas.drawBitmap(enemyTextures[enemy.spriteId * 5 + sprite], null, dst, paint)
         }
-    }
+    }*/
 
     fun drawWeapon(state: GameState, canvas: Canvas) {
         val weaponWidth = 1024f
