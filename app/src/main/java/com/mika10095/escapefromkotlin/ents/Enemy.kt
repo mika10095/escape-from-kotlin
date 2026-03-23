@@ -28,7 +28,6 @@ class Enemy(val spriteId: Int = 0,val attackRange: Float = 512f,val shootDelay: 
         CHASE,
         SEARCH
     }
-
     fun update(gameState: GameState, dt: Double) {
         super.update(dt)
         updateVisibility(gameState)

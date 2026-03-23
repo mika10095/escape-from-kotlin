@@ -8,6 +8,7 @@ import com.mika10095.escapefromkotlin.engine.map.Renderer
 import com.mika10095.escapefromkotlin.ents.Enemy
 import com.mika10095.escapefromkotlin.ents.Player
 import com.mika10095.escapefromkotlin.input.InputSystem
+import java.lang.Math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -84,10 +85,12 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                             x * gameMap.tileSize + gameMap.tileSize/2,
                             y * gameMap.tileSize + gameMap.tileSize/2
                         )
+                        enemy.rot = (Random.nextFloat()-0.5f)*2*PI.toFloat()
                         enemies.add(enemy)
                     }
                     gameMap.tiles.PLAYER -> {
                         player = Player()
+                        player.radius = 20f
                         player.setPosition(
                             x * gameMap.tileSize + gameMap.tileSize/2,
                             y * gameMap.tileSize + gameMap.tileSize/2
@@ -358,6 +361,11 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     }
 
     fun updateState(dt: Double, inputSystem: InputSystem) {
+        if(levelTimer == 0.0){
+            inputSystem.resetWeapon()
+            inputSystem.clearInputs()
+        }
+
         levelTimer += dt
         menuSwitchCooldown -= dt
         updateMenu(dt, inputSystem)
@@ -384,45 +392,5 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
         }
 
-    }
-
-    fun playerShoot() {
-        val px = player.posx
-        val py = player.posy
-        val angle = player.rot
-
-        val rayHit = renderer.raycaster.castRay(
-            px,
-            py,
-            angle,
-            gameMap
-        )
-
-        var closestEnemy: Enemy? = null
-        var closestDist = Float.MAX_VALUE
-
-        for (enemy in enemies) {
-            val dx = enemy.posx - px
-            val dy = enemy.posy - py
-
-            val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
-
-            val dot = dx * cos(angle) + dy * sin(angle)
-
-            if (dot < 0) continue
-
-            val perpDist = abs(
-                dx * sin(angle) - dy * cos(angle)
-            )
-
-            if (perpDist < enemy.radius && enemy.hp > 0) {
-                if (dist < rayHit.distance && dist < closestDist) {
-                    closestDist = dist
-                    closestEnemy = enemy
-                }
-            }
-        }
-
-        closestEnemy?.takeDamage(Random.nextInt(10,30))
     }
 }
