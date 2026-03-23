@@ -2,6 +2,7 @@ package com.mika10095.escapefromkotlin.ents
 
 import android.util.Log
 import com.mika10095.escapefromkotlin.engine.GameState
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -23,6 +24,9 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
     val viewDistance = 1024f
     val hearingRange = 256f
     var damage = 15
+    var wandertimer = 0f
+    var wallBumpCooldown = 0.5f
+    var wanderdirection = 0f
     val fov = Math.toRadians(90.0).toFloat()
     enum class State {
         WANDER,
@@ -59,7 +63,8 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
         val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
 
         shootCooldown -= dt.toFloat()
-
+        wandertimer -= dt.toFloat()
+        wallBumpCooldown -= dt.toFloat()
         if (player.shooting && dist < hearingRange) {
             lastSeenX = player.posx
             lastSeenY = player.posy
@@ -91,17 +96,22 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
     }
 
     fun wander(gameState: GameState, dt: Double) {
-        rot += (Math.random().toFloat() - 0.5f) * turnspeed * dt.toFloat() * 3f
-
-        val moveSpeed = speed * 0.1f
+        if(wandertimer < 0) {
+            wanderdirection = Random.nextDouble(-PI, PI).toFloat()
+            wandertimer = Random.nextDouble(3.0,10.0).toFloat()
+            Log.d("pathing","Enemy changing course! $wanderdirection for $wandertimer seconds ")
+        }
+        rotateTowards(wanderdirection,dt)
+        val moveSpeed = speed * 0.25f
 
         val moveX = cos(rot) * moveSpeed * dt.toFloat()
         val moveY = sin(rot) * moveSpeed * dt.toFloat()
-        if (!gameState.gameMap.isWallCircle(posx + moveX, posy, radius)) {
-            posx += moveX
-        }
-        if (!gameState.gameMap.isWallCircle(posx, posy + moveY, radius)) {
-            posy += moveY
+        val movedFully = gameState.tryMoveEntity(this,moveX,moveY)
+        if (!movedFully && wallBumpCooldown < 0)
+        {
+            Log.d("pathing","Enemy couldnt move fully!")
+            wandertimer = -1f
+            wallBumpCooldown = 0.5f
         }
     }
 
@@ -130,13 +140,7 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
         if (dist > attackRange || !visible) {
             val moveX = cos(rot) * speed * moveFactor * dt.toFloat()
             val moveY = sin(rot) * speed * moveFactor * dt.toFloat()
-
-            if (!gameState.gameMap.isWallCircle(posx + moveX, posy, radius)) {
-                posx += moveX
-            }
-            if (!gameState.gameMap.isWallCircle(posx, posy + moveY, radius)) {
-                posy += moveY
-            }
+            gameState.tryMoveEntity(this,moveX,moveY)
         }
         Log.d("game", "Enemy angle: " + abs(Math.toDegrees(diff.toDouble())))
         // shooting

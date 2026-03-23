@@ -142,7 +142,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
         mapInit()
     }
     fun tryMoveEntity(entity: EntityBase, dx: Float, dy: Float): Boolean {
-        var moved = false
+        var movedFully = false
 
         val nx = entity.posx + dx
         val ny = entity.posy + dy
@@ -155,19 +155,19 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
             canBoth -> {
                 entity.posx = nx
                 entity.posy = ny
-                moved = true
+                movedFully = true
             }
             canX -> {
                 entity.posx = nx
-                moved = true
+                movedFully = false
             }
             canY -> {
                 entity.posy = ny
-                moved = true
+                movedFully = false
             }
         }
 
-        return moved
+        return movedFully
     }
     fun isBlockedCircle(x: Float, y: Float, radius: Float, ignore: EntityBase? = null): Boolean {
         if (gameMap.isWallCircle(x, y, radius)) return true
@@ -287,13 +287,23 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
     fun drawEntities(canvas: Canvas) {
         for (entity in entities) {
-            if(!entity.visible)
+            if(!entity.visible && !settingsManager.debug)
                 continue
             val paint = Paint()
             paint.color = if (entity.hp == 0) Color.GRAY
             else  Color.RED
             canvas.drawCircle(entity.posx + offsetX, entity.posy + offsetY, entity.radius, paint)
-
+            if(settingsManager.debug) {
+                paint.color = Color.GREEN
+                paint.strokeWidth = 5f
+                canvas.drawLine(
+                    entity.posx + offsetX,
+                    entity.posy + offsetY,
+                    entity.posx + offsetX + 40 * cos(entity.rot),
+                    entity.posy + offsetY + 40 * sin(entity.rot),
+                    paint
+                )
+            }
         }
     }
 
