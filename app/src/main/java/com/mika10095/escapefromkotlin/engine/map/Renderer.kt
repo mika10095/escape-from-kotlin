@@ -49,6 +49,7 @@ class Renderer(context: Context) {
         BitmapFactory.decodeResource(context.resources, R.drawable.enemy_dead)
     )
     val propTextures = arrayOf(
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_0),
         BitmapFactory.decodeResource(context.resources, R.drawable.prop_1),
         BitmapFactory.decodeResource(context.resources, R.drawable.prop_2),
         BitmapFactory.decodeResource(context.resources, R.drawable.prop_3),
@@ -62,42 +63,42 @@ class Renderer(context: Context) {
         BitmapFactory.decodeResource(context.resources, R.drawable.prop_11),
         BitmapFactory.decodeResource(context.resources, R.drawable.prop_12),
         BitmapFactory.decodeResource(context.resources, R.drawable.prop_13),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_1),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_2),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_3),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_4),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_5),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_6),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_7),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_8),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_9),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_10),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_11),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_12),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_13),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_14),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_15),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_16),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_17),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_18),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_19),
-        BitmapFactory.decodeResource(context.resources, R.drawable.prop_solid_20)
+        //solid
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_14),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_15),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_16),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_17),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_18),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_19),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_20),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_21),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_22),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_23),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_24),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_25),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_26),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_27),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_28),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_29),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_30),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_31),
+        BitmapFactory.decodeResource(context.resources, R.drawable.prop_32),
     )
     val pickupables = arrayOf(
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_shotgun),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_panzerfaust),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_small),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_medium),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_large),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_small),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_large),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_pistol),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_shotgun),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_small),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_medium),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_large),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_huge),
-        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_key_1),
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_shotgun), //-200
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_panzerfaust),//-201
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_small),//-202
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_medium),//-203
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_health_large),//-204
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_small),//-205
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_armor_large),//-206
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_pistol),//-207
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_ammo_shotgun),//-208
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_small),//-209
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_medium),//-210
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_large),//-211
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_treasure_huge),//-212
+        BitmapFactory.decodeResource(context.resources, R.drawable.pickup_key_1),////-213
 
     )
     val weaponTextures = arrayOf(
