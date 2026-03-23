@@ -8,6 +8,7 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sign
 import kotlin.math.sin
+import kotlin.random.Random
 
 class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBase() {
     override var solid = true
@@ -27,6 +28,22 @@ class Enemy(val attackRange: Float = 512f,val shootDelay: Float = 3f) : EntityBa
         CHASE,
         SEARCH
     }
+
+    override fun onDelete(state: GameState) {
+        super.onDelete(state)
+        val pickup = PickupItem()
+        pickup.setPosition(
+            posx,
+            posy
+        )
+
+        val pickupId = Random.nextInt(2,10)
+        pickup.spriteId = pickupId
+
+
+        state.entities.add(pickup)
+    }
+
     override fun update(state: GameState, dt: Double) {
         super.update(state, dt)
         updateVisibility(state)

@@ -29,6 +29,7 @@ abstract class EntityBase(var hp: Int = 100, var posx: Float = 0f, var posy: Flo
         hp = 0
     }
     open fun onPlayerTouch(state: GameState) {}
+    open fun onDelete(state: GameState) {}
     open fun update(state: GameState, dt : Double){
         if(hp == 0)
             deathTimer-=dt.toFloat()

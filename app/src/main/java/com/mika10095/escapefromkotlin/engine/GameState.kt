@@ -76,6 +76,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
         "Back"
     )
     var levelTimer = 0.0
+    var levelStarted = false
     var offsetX = 0f
     var offsetY = 0f
     fun mapInit(){
@@ -137,6 +138,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     fun resetLevel(){
         entities.clear()
         levelTimer = 0.0
+        levelStarted = false
         mapInit()
     }
     fun tryMoveEntity(entity: EntityBase, dx: Float, dy: Float): Boolean {
@@ -228,7 +230,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
         paint.textSize = 60f
 
         val menuItems = when (currentMenu) {
-            MenuType.MAIN -> if (levelTimer > 0)
+            MenuType.MAIN -> if (levelStarted)
                     startedMenuItems
                 else
                     mainMenuItems
@@ -323,7 +325,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
     fun updateMenu(dt: Double, inputSystem: InputSystem) {
         if ( menuSwitchCooldown > 0 ) return
         val menuItems = when (currentMenu) {
-            MenuType.MAIN -> if (levelTimer > 0)
+            MenuType.MAIN -> if (levelStarted)
                 startedMenuItems
             else
                 mainMenuItems
@@ -345,17 +347,19 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                 menuSwitchCooldown = 0.25
             }
 
-            if (inputSystem.shootInput && currentMenu == MenuType.MAIN && levelTimer > 0.0) {
+            if (inputSystem.shootInput && currentMenu == MenuType.MAIN && levelStarted) {
                 when (selectedMenuItem) {
 
                     0 -> {
                         currentState = StateEnum.GAME
+                        levelStarted = true
                     }
 
                     1 -> {
 
                         currentState = StateEnum.GAME
                         resetLevel()
+                        levelStarted = true
                     }
 
                     2 -> {
@@ -377,6 +381,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
 
                     0 -> {
                         currentState = StateEnum.GAME
+                        levelStarted = true
                     }
 
                     1 -> {
@@ -461,6 +466,7 @@ class GameState(var settingsManager: SettingsManager, var renderer: Renderer) {
                     }
                 }
             }
+            entities.filter { it.dead }.forEach { it.onDelete(this) }
             entities.removeAll { it.dead }
 
 
